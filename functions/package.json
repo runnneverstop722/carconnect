@@ -1,0 +1,36 @@
+
+{
+  "name": "carconnect-firebase-functions",
+  "version": "1.0.0",
+  "description": "Firebase Functions for CarConnect MVP backend proxy.",
+  "main": "index.js",
+  "type": "module",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "keywords": [
+    "gemini",
+    "api",
+    "proxy",
+    "firebase"
+  ],
+  "author": "CarConnect Development",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "firebase-functions": "^5.0.1"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  }
+}
