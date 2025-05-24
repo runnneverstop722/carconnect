@@ -21,15 +21,15 @@ const App = () => { // Simplified component declaration
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   
-  const [historicSearches, setHistoricSearches] = useState<HistoricCarSearch[]>([]);
+  const [historicSearches, setHistoricSearches] = useState<Array<HistoricCarSearch>>([]);
   const [activeSearch, setActiveSearch] = useState<HistoricCarSearch | null>(null);
   const [isCarSearchLoading, setIsCarSearchLoading] = useState(false);
   const [carSearchError, setCarSearchError] = useState<string | null>(null);
   
-  const [likedCars, setLikedCars] = useState<LikedCar[]>([]);
+  const [likedCars, setLikedCars] = useState<Array<LikedCar>>([]);
   const [modelForDealershipSearch, setModelForDealershipSearch] = useState<string | null>(null);
 
-  const [comparisonList, setComparisonList] = useState<HistoricCarSearch[]>([]);
+  const [comparisonList, setComparisonList] = useState<Array<HistoricCarSearch>>([]);
   const [isComparisonViewActive, setIsComparisonViewActive] = useState(false);
   const [isCarTypesGuideOpen, setIsCarTypesGuideOpen] = useState(false);
 
