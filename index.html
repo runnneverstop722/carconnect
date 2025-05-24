@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CarConnect</title>
+  <title>CarConnect MVP</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -38,14 +38,17 @@
     "@google/genai": "https://esm.sh/@google/genai@^1.0.0",
     "dotenv": "https://esm.sh/dotenv@^16.5.0",
     "cors": "https://esm.sh/cors@^2.8.5",
-    "firebase-functions": "https://esm.sh/firebase-functions@^6.3.2"
+    "firebase-functions": "https://esm.sh/firebase-functions@^6.3.2",
+    "firebase-functions/": "https://esm.sh/firebase-functions@^6.3.2/"
   }
 }
 </script>
+  <!-- Include Babel Standalone -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body class="bg-gray-900 text-gray-100 antialiased">
   <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
+  <!-- Change script type to text/babel and add data-type="module" -->
+  <script type="text/babel" data-type="module" src="/index.tsx"></script>
 </body>
-</html><link rel="stylesheet" href="index.css">
-<script src="index.tsx" type="module"></script>
+</html>
