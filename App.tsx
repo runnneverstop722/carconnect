@@ -17,7 +17,7 @@ import { APP_NAME, MOCK_DEALERSHIPS } from './constants.ts';
 import { XCircleIcon, BookOpenIcon } from './components/icons.tsx';
 
 
-const App = () => { // Simplified component declaration
+const App = () => { 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   
@@ -48,12 +48,12 @@ const App = () => { // Simplified component declaration
     } catch (e) { localStorage.removeItem('carConnectHistoricSearches'); }
   }, []);
 
-  const saveHistoricSearches = (searches: Array<HistoricCarSearch>) => {
+  const saveHistoricSearches = (searches) => { // Removed HistoricCarSearch[] type
     setHistoricSearches(searches);
     localStorage.setItem('carConnectHistoricSearches', JSON.stringify(searches));
   };
 
-  const handleLoginSuccess = useCallback((user: User) => {
+  const handleLoginSuccess = useCallback((user) => { // Removed User type
     setCurrentUser(user);
     localStorage.setItem('carConnectUser', JSON.stringify(user));
     setIsLoginModalOpen(false);
@@ -65,7 +65,7 @@ const App = () => { // Simplified component declaration
     localStorage.removeItem('carConnectUser');
   }, []);
   
-  const handleInitiateSearch = useCallback(async (modelName: string) => {
+  const handleInitiateSearch = useCallback(async (modelName) => { // Removed string type
     if (!modelName.trim()) {
       setCarSearchError("Please enter a car model.");
       return;
@@ -103,7 +103,6 @@ const App = () => { // Simplified component declaration
         localStorage.setItem('carConnectHistoricSearches', JSON.stringify(updatedSearches));
         return updatedSearches;
       });
-       // Scroll to results after search
       const searchResultsElement = document.getElementById('car-search-results-area');
       if (searchResultsElement) {
         searchResultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -117,7 +116,7 @@ const App = () => { // Simplified component declaration
     }
   }, []);
 
-  const handleSelectHistoricSearch = (search: HistoricCarSearch) => {
+  const handleSelectHistoricSearch = (search) => { // Removed HistoricCarSearch type
     setActiveSearch(search);
     setCarSearchError(null); 
     setModelForDealershipSearch(null);
@@ -138,7 +137,7 @@ const App = () => { // Simplified component declaration
   };
 
 
-  const handleToggleLikeCar = useCallback((modelName: string) => {
+  const handleToggleLikeCar = useCallback((modelName) => { // Removed string type
     setLikedCars(prevLikedCars => {
       const isLiked = prevLikedCars.includes(modelName);
       const updatedLikedCars = isLiked
@@ -149,7 +148,7 @@ const App = () => { // Simplified component declaration
     });
   }, []);
 
-  const handleFindDealersForModel = (modelName: string) => {
+  const handleFindDealersForModel = (modelName) => { // Removed string type
     setModelForDealershipSearch(modelName);
     setIsComparisonViewActive(false);
     const locatorElement = document.getElementById('dealership-locator-section');
@@ -160,7 +159,7 @@ const App = () => { // Simplified component declaration
     setModelForDealershipSearch(null);
   }
 
-  const handleToggleCompare = (searchItem: HistoricCarSearch) => {
+  const handleToggleCompare = (searchItem) => { // Removed HistoricCarSearch type
     setComparisonList(prev => {
       if (prev.find(item => item.modelName === searchItem.modelName)) {
         return prev.filter(item => item.modelName !== searchItem.modelName);
@@ -194,19 +193,15 @@ const App = () => { // Simplified component declaration
     setIsComparisonViewActive(false);
   };
 
-  const handleSelectModelFromGuideAndSearch = (modelName: string) => {
-    setIsCarTypesGuideOpen(false); // Close the guide
-    // Prefill the search bar in CarSearch.tsx - This requires CarSearch to accept a prop or a ref to update its internal state.
-    // For now, we can directly initiate search. If prefill is strongly desired, CarSearch needs minor refactor.
-    // Let's find the CarSearch input and set its value if possible, then initiate search.
+  const handleSelectModelFromGuideAndSearch = (modelName) => { // Removed string type
+    setIsCarTypesGuideOpen(false); 
     const searchInput = document.querySelector('#car-search-section input[type="text"]') as HTMLInputElement;
     if (searchInput) {
         searchInput.value = modelName;
-         // Dispatch an input event so React recognizes the change if CarSearch is controlled
         const event = new Event('input', { bubbles: true });
         searchInput.dispatchEvent(event);
     }
-    handleInitiateSearch(modelName); // Initiate search for the selected model
+    handleInitiateSearch(modelName); 
   };
 
 
@@ -219,7 +214,6 @@ const App = () => { // Simplified component declaration
       />
       
       <main className="flex-grow container mx-auto px-2 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8 max-w-4xl">
-        {/* Removed API Key check from frontend */}
 
         {isComparisonViewActive ? (
           <div id="car-comparison-view-section">
