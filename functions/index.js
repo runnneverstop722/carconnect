@@ -51,7 +51,7 @@ if (GEMINI_API_KEY) {
 
 // --- API Proxy Endpoint ---
 // The path '/fetch-car-details' is relative to the '/api/' rewrite in firebase.json
-app.post('/fetch-car-details', async (req, res) => {
+app.post('/api/fetch-car-details', async (req, res) => {
   if (!ai) {
     console.error("Gemini AI client not initialized. Check API_KEY configuration.");
     return res.status(500).json({ error: 'AI service configuration error on server.' });
