@@ -48,7 +48,7 @@ const App = () => { // Simplified component declaration
     } catch (e) { localStorage.removeItem('carConnectHistoricSearches'); }
   }, []);
 
-  const saveHistoricSearches = (searches: HistoricCarSearch[]) => {
+  const saveHistoricSearches = (searches: Array<HistoricCarSearch>) => {
     setHistoricSearches(searches);
     localStorage.setItem('carConnectHistoricSearches', JSON.stringify(searches));
   };
