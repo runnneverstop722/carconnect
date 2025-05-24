@@ -48,12 +48,12 @@ const App = () => {
     } catch (e) { localStorage.removeItem('carConnectHistoricSearches'); }
   }, []);
 
-  const saveHistoricSearches = (searches) => { // Removed HistoricCarSearch[] type
+  const saveHistoricSearches = (searches) => {
     setHistoricSearches(searches);
     localStorage.setItem('carConnectHistoricSearches', JSON.stringify(searches));
   };
 
-  const handleLoginSuccess = useCallback((user) => { // Removed User type
+  const handleLoginSuccess = useCallback((user) => {
     setCurrentUser(user);
     localStorage.setItem('carConnectUser', JSON.stringify(user));
     setIsLoginModalOpen(false);
@@ -65,7 +65,7 @@ const App = () => {
     localStorage.removeItem('carConnectUser');
   }, []);
   
-  const handleInitiateSearch = useCallback(async (modelName) => { // Removed string type
+  const handleInitiateSearch = useCallback(async (modelName) => {
     if (!modelName.trim()) {
       setCarSearchError("Please enter a car model.");
       return;
@@ -79,8 +79,8 @@ const App = () => {
     const userLang = navigator.language || 'en';
 
     try {
-      const details: CarDetails = await fetchCarDetailsFromGemini(modelName.trim(), userLang);
-      const newSearch: HistoricCarSearch = { 
+      const details = await fetchCarDetailsFromGemini(modelName.trim(), userLang);
+      const newSearch = { 
         modelName: modelName.trim(), 
         details, 
         timestamp: Date.now(),
@@ -116,7 +116,7 @@ const App = () => {
     }
   }, []);
 
-  const handleSelectHistoricSearch = (search) => { // Removed HistoricCarSearch type
+  const handleSelectHistoricSearch = (search) => {
     setActiveSearch(search);
     setCarSearchError(null); 
     setModelForDealershipSearch(null);
@@ -137,7 +137,7 @@ const App = () => {
   };
 
 
-  const handleToggleLikeCar = useCallback((modelName) => { // Removed string type
+  const handleToggleLikeCar = useCallback((modelName) => {
     setLikedCars(prevLikedCars => {
       const isLiked = prevLikedCars.includes(modelName);
       const updatedLikedCars = isLiked
@@ -148,7 +148,7 @@ const App = () => {
     });
   }, []);
 
-  const handleFindDealersForModel = (modelName) => { // Removed string type
+  const handleFindDealersForModel = (modelName) => {
     setModelForDealershipSearch(modelName);
     setIsComparisonViewActive(false);
     const locatorElement = document.getElementById('dealership-locator-section');
@@ -159,7 +159,7 @@ const App = () => {
     setModelForDealershipSearch(null);
   }
 
-  const handleToggleCompare = (searchItem) => { // Removed HistoricCarSearch type
+  const handleToggleCompare = (searchItem) => {
     setComparisonList(prev => {
       if (prev.find(item => item.modelName === searchItem.modelName)) {
         return prev.filter(item => item.modelName !== searchItem.modelName);
@@ -193,10 +193,10 @@ const App = () => {
     setIsComparisonViewActive(false);
   };
 
-  const handleSelectModelFromGuideAndSearch = (modelName) => { // Removed string type
+  const handleSelectModelFromGuideAndSearch = (modelName) => {
     setIsCarTypesGuideOpen(false); 
-    const searchInput = document.querySelector('#car-search-section input[type="text"]') as HTMLInputElement;
-    if (searchInput) {
+    const searchInput = document.querySelector('#car-search-section input[type="text"]'); // Removed 'as HTMLInputElement'
+    if (searchInput && searchInput instanceof HTMLInputElement) { // Added instanceof check for safety
         searchInput.value = modelName;
         const event = new Event('input', { bubbles: true });
         searchInput.dispatchEvent(event);
@@ -276,7 +276,7 @@ const App = () => {
               <DealershipEmailer currentCarModel={activeSearch.modelName} />
             )}
             {!modelForDealershipSearch && !activeSearch && MOCK_DEALERSHIPS.length > 0 && (
-               <DealershipEmailer />
+               <DealershipEmailer currentCarModel={null} />
             )}
           </>
         )}
