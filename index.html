@@ -44,12 +44,11 @@
 }
 </script>
   <!-- Include Babel Standalone -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script> -->
 </head>
 <body class="bg-gray-900 text-gray-100 antialiased">
   <div id="root"></div>
-  <!-- Change script type to text/babel and add data-type="module" -->
-  <script type="text/babel" data-type="module" src="/index.tsx"></script>
-  <!-- v1.0.1 -->
+  <!-- Change this line -->
+  <script type="module" src="/index.tsx"></script> <!-- Make sure src points to your entry file -->
 </body>
 </html>
