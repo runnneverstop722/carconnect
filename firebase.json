@@ -1,19 +1,12 @@
-
 {
   "hosting": {
     "public": ".",
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**",
-      "functions/**",
-      "backend/**"
+      "**/node_modules/**"
     ],
     "rewrites": [
-      {
-        "source": "/api/**",
-        "function": "api"
-      },
       {
         "source": "**",
         "destination": "/index.html"
@@ -29,7 +22,7 @@
         ".git",
         "firebase-debug.log",
         "firebase-debug.*.log",
-        ".runtimeconfig.json"
+        "*.local"
       ],
       "runtime": "nodejs20"
     }

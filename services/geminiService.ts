@@ -90,7 +90,7 @@ export const fetchCarDetailsFromGemini = async (carModel: string, userLanguage?:
     console.error("Error fetching car details via proxy:", error);
     let errorMessage = "Failed to fetch car details. The backend service might be unavailable or the request failed.";
     if (error instanceof Error) {
-        errorMessage += \` Details: ${error.message}\`;
+        errorMessage += ` Details: ${error.message}`;
     }
     if (error instanceof SyntaxError) { 
         errorMessage = "Failed to parse response from backend service. The data format might be incorrect. Raw response from proxy: " + rawProxyResponseText;

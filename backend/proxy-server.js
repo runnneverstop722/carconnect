@@ -60,10 +60,10 @@ app.post('/api/fetch-car-details', async (req, res) => {
   }
 
   const languageInstruction = userLanguage
-    ? \`Please provide the response in ${userLanguage} if possible. If not, please use English.\`
+    ? `Please provide the response in ${userLanguage} if possible. If not, please use English.`
     : "Provide general information in English.";
 
-  const prompt = \`
+  const prompt = `
     For the car model "${carModel}", ${languageInstruction} Provide detailed information for the following aspects.
     If a piece of information is not available or applicable, clearly state "Not available" or omit the field for lists.
     Focus on models typically sold in a region that primarily uses ${userLanguage || 'English'}, if regional variations exist.
@@ -103,7 +103,7 @@ app.post('/api/fetch-car-details', async (req, res) => {
     }
     Ensure the JSON is well-formed and contains only the requested data. If a specific field like 'build_and_price_url' is not found, it can be omitted from the JSON or have a null value.
     For lists like 'recall_notices', if none are found, return an empty list [] or omit the key.
-  \`;
+  `;
 
   try {
     const result = await ai.models.generateContent({
@@ -121,18 +121,18 @@ app.post('/api/fetch-car-details', async (req, res) => {
     console.error('Error calling Gemini API:', error);
     let errorMessage = 'Failed to fetch car details from AI service.';
     if (error.message) {
-        errorMessage += \` Details: ${error.message}\`;
+        errorMessage += ` Details: ${error.message}`;
     }
     if (error.response && error.response.data && error.response.data.error) {
-        errorMessage += \` Gemini Error: ${error.response.data.error.message}\`;
+        errorMessage += ` Gemini Error: ${error.response.data.error.message}`;
     }
     res.status(500).json({ error: errorMessage });
   }
 });
 
 app.listen(port, () => {
-  console.log(\`CarConnect backend proxy server listening on port ${port}\`);
-  console.log(\`CORS enabled for origin: ${corsOptions.origin}\`);
+  console.log(`CarConnect backend proxy server listening on port ${port}`);
+  console.log(`CORS enabled for origin: ${corsOptions.origin}`);
   if (!GEMINI_API_KEY) {
     console.warn("Warning: API_KEY environment variable is not set. AI features will not work.");
   }
