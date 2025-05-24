@@ -3,34 +3,37 @@ import express from 'express';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import functions from 'firebase-functions';
+// Import onRequest from the V2 SDK
+import {onRequest} from 'firebase-functions/v2/https';
 
 // Load environment variables from .env file for local development (Firebase Emulator)
-// For deployed functions, set these variables via `firebase functions:config:set` or in GCP console.
+// For deployed functions, Firebase sets these variables from `firebase functions:config:set` into process.env
 dotenv.config();
 
 const app = express();
 
 // --- CORS Configuration ---
-// For deployed function, set FRONTEND_URL in Firebase environment configuration
-// e.g., firebase functions:config:set env.frontend_url="https://your-project-id.web.app"
+// For deployed function, FRONTEND_URL is set via `firebase functions:config:set env.frontend_url="https://your-project-id.web.app"`
+// and will be available in process.env.FRONTEND_URL
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || functions.config().env?.frontend_url || 'https://carconnect-mvp-1012514681910.us-west1.run.app', // Fallback for safety
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Allow localhost for local dev/emulator
   optionsSuccessStatus: 200 
 };
 app.use(cors(corsOptions));
+console.log(`CORS configured for origin: ${process.env.FRONTEND_URL || 'http://localhost:3000 (fallback)'}`);
+
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
 // --- Gemini API Configuration ---
-// For deployed function, set API_KEY in Firebase environment configuration
-// e.g., firebase functions:config:set env.api_key="YOUR_GEMINI_API_KEY"
-const GEMINI_API_KEY = process.env.API_KEY || functions.config().env?.api_key;
+// API_KEY is set via `firebase functions:config:set env.api_key="YOUR_GEMINI_API_KEY"`
+// and will be available in process.env.API_KEY
+const GEMINI_API_KEY = process.env.API_KEY;
 const MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
 
 if (!GEMINI_API_KEY) {
-  console.error("CRITICAL: Gemini API key (API_KEY or functions.config().env.api_key) not found in server environment variables.");
+  console.error("CRITICAL: Gemini API key (process.env.API_KEY) not found in server environment variables.");
 }
 
 let ai;
@@ -43,6 +46,7 @@ if (GEMINI_API_KEY) {
   }
 } else {
   ai = null;
+  console.warn("Gemini AI client not initialized because API_KEY is missing.");
 }
 
 // --- API Proxy Endpoint ---
@@ -130,6 +134,6 @@ app.post('/fetch-car-details', async (req, res) => {
   }
 });
 
-// Expose Express API as a single Cloud Function:
+// Expose Express API as a single Cloud Function using V2 onRequest:
 // The name 'api' here must match the function name in firebase.json rewrites.
-export const api = functions.https.onRequest(app);
+export const api = onRequest(app);
