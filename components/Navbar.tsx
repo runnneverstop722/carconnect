@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { User } from '../types';
-import { APP_NAME } from '../constants';
-import { UserCircleIcon, LogoutIcon } from './icons';
+import { User } from '../types.ts';
+import { APP_NAME } from '../constants.ts';
+import { UserCircleIcon, LogoutIcon } from './icons.tsx';
 
 interface NavbarProps {
   currentUser: User | null;

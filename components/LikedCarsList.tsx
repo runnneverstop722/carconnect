@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { LikedCar } from '../types';
-import { TrashIcon, MapPinIcon } from './icons';
+import { LikedCar } from '../types.ts';
+import { TrashIcon, MapPinIcon } from './icons.tsx';
 
 interface LikedCarsListProps {
   likedCars: LikedCar[];

@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { ManufacturerInfo } from '../types';
-import { GlobeIcon } from './icons';
+import { ManufacturerInfo } from '../types.ts';
+import { GlobeIcon } from './icons.tsx';
 
 interface ManufacturerLinkProps {
   manufacturer: ManufacturerInfo;

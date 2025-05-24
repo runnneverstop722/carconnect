@@ -1,6 +1,6 @@
 import React from 'react';
-import { HistoricCarSearch, CarDetails } from '../types';
-import { XCircleIcon, CheckIcon, MinusIcon } from './icons'; // Assuming CheckIcon and MinusIcon exist for pros/cons
+import { HistoricCarSearch, CarDetails } from '../types.ts';
+import { XCircleIcon, CheckIcon, MinusIcon } from './icons.tsx'; // Assuming CheckIcon and MinusIcon exist
 
 interface CarComparisonViewProps {
   carsToCompare: HistoricCarSearch[];

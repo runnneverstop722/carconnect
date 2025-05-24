@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { YouTubeVideo } from '../types';
-import { YouTubeIcon } from './icons';
+import { YouTubeVideo } from '../types.ts';
+import { YouTubeIcon } from './icons.tsx';
 
 interface YouTubeResultCardProps {
   video: YouTubeVideo;

@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { MOCK_DEALERSHIPS } from '../constants';
-import { Dealership } from '../types';
-import { MapPinIcon, MailIcon, SearchIcon, XCircleIcon } from './icons';
+import { MOCK_DEALERSHIPS } from '../constants.ts';
+import { Dealership } from '../types.ts';
+import { MapPinIcon, MailIcon, SearchIcon, XCircleIcon } from './icons.tsx';
 
 interface DealershipLocatorProps {
   carModel: string;

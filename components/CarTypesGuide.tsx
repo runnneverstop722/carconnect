@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { CAR_TYPES_DATA } from '../constants';
-import { CarTypeInfo, ExampleModel } from '../types';
+import { CAR_TYPES_DATA } from '../constants.ts';
+import { CarTypeInfo, ExampleModel } from '../types.ts';
 import { 
   XCircleIcon, ChevronRightIcon, CarKeyIcon,
   SedanIcon, SuvIcon, HatchbackIcon, TruckIcon, // Main type icons
   VolumeOffIcon, UserGroupIcon, FuelIcon, RoadIcon, ArchiveBoxXMarkIcon, ArchiveBoxIcon, ArchiveBoxArrowDownIcon, ArrowDownCircleIcon, EyeIcon, CogIcon, MapIcon, ArrowsPointingOutIcon, ArrowsPointingInIcon, VolumeUpIcon, QuestionMarkCircleIcon, CubeTransparentIcon, LinkIcon, WrenchScrewdriverIcon // Benefit/con icons
-} from './icons';
+} from './icons.tsx';
 
 interface CarTypesGuideProps {
   isOpen: boolean;

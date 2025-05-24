@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { MOCK_DEALERSHIPS } from '../constants';
-import { Dealership } from '../types';
-import { MailIcon, ChevronDownIcon } from './icons';
+import { MOCK_DEALERSHIPS } from '../constants.ts';
+import { Dealership } from '../types.ts';
+import { MailIcon, ChevronDownIcon } from './icons.tsx';
 
 interface DealershipEmailerProps {
   currentCarModel?: string; // Optional: To prefill email subject

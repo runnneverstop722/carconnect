@@ -1,14 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { CarDetails, LikedCar, HistoricCarSearch } from '../types';
-import LoadingSpinner from './LoadingSpinner';
-import YouTubeResultCard from './YouTubeResultCard';
-import ManufacturerLink from './ManufacturerLink';
-import ShareContentButton from './ShareContentButton';
+import { CarDetails, LikedCar, HistoricCarSearch } from '../types.ts';
+import LoadingSpinner from './LoadingSpinner.tsx';
+import YouTubeResultCard from './YouTubeResultCard.tsx';
+import ManufacturerLink from './ManufacturerLink.tsx';
+import ShareContentButton from './ShareContentButton.tsx';
 import { 
   SearchIcon, XCircleIcon, HeartIcon, HeartOutlineIcon, GlobeAsiaAustraliaIcon, 
   SparklesIcon, CameraIcon, WrenchScrewdriverIcon, ExclamationTriangleIcon,
   ChatBubbleLeftEllipsisIcon, CurrencyDollarIcon, BookOpenIcon // Added BookOpenIcon
-} from './icons'; 
+} from './icons.tsx'; 
 
 interface CarSearchProps {
   activeSearch: HistoricCarSearch | null; 

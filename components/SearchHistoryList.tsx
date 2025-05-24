@@ -1,6 +1,6 @@
 import React from 'react';
-import { HistoricCarSearch } from '../types';
-import { TrashIcon, CheckSquareIcon, SquareIcon, ClipboardListIcon, EyeIcon } from './icons'; // Assuming CheckSquareIcon and SquareIcon exist
+import { HistoricCarSearch } from '../types.ts';
+import { TrashIcon, CheckSquareIcon, SquareIcon, ClipboardListIcon, EyeIcon } from './icons.tsx'; // Assuming CheckSquareIcon and SquareIcon exist
 
 interface SearchHistoryListProps {
   historicSearches: HistoricCarSearch[];

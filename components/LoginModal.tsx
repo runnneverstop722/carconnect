@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { mockLogin } from '../services/mockAuthService';
-import { User, AuthProvider } from '../types';
-import { GoogleIcon, AppleIcon, XCircleIcon, MailIcon } from './icons';
-import { APP_NAME } from '../constants'; // Import APP_NAME
+import { mockLogin } from '../services/mockAuthService.ts';
+import { User, AuthProvider } from '../types.ts';
+import { GoogleIcon, AppleIcon, XCircleIcon, MailIcon } from './icons.tsx';
+import { APP_NAME } from '../constants.ts'; // Import APP_NAME
 
 interface LoginModalProps {
   isOpen: boolean;

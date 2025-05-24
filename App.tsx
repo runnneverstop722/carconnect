@@ -1,20 +1,20 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import Navbar from './components/Navbar';
-import LoginModal from './components/LoginModal';
-import CarSearch from './components/CarSearch';
-import DealershipEmailer from './components/DealershipEmailer';
-import LikedCarsList from './components/LikedCarsList';
-import DealershipLocator from './components/DealershipLocator';
-import Footer from './components/Footer';
-import SearchHistoryList from './components/SearchHistoryList'; // New
-import CarComparisonView from './components/CarComparisonView'; // New
-import CarTypesGuide from './components/CarTypesGuide'; // New
-import { User, LikedCar, HistoricCarSearch, CarDetails } from './types';
-import { mockLogout } from './services/mockAuthService';
-import { fetchCarDetailsFromGemini } from './services/geminiService';
-import { APP_NAME, MOCK_DEALERSHIPS } from './constants';
-import { XCircleIcon, BookOpenIcon } from './components/icons';
+import Navbar from './components/Navbar.tsx';
+import LoginModal from './components/LoginModal.tsx';
+import CarSearch from './components/CarSearch.tsx';
+import DealershipEmailer from './components/DealershipEmailer.tsx';
+import LikedCarsList from './components/LikedCarsList.tsx';
+import DealershipLocator from './components/DealershipLocator.tsx';
+import Footer from './components/Footer.tsx';
+import SearchHistoryList from './components/SearchHistoryList.tsx'; // New
+import CarComparisonView from './components/CarComparisonView.tsx'; // New
+import CarTypesGuide from './components/CarTypesGuide.tsx'; // New
+import { User, LikedCar, HistoricCarSearch, CarDetails } from './types.ts';
+import { mockLogout } from './services/mockAuthService.ts';
+import { fetchCarDetailsFromGemini } from './services/geminiService.ts';
+import { APP_NAME, MOCK_DEALERSHIPS } from './constants.ts';
+import { XCircleIcon, BookOpenIcon } from './components/icons.tsx';
 
 
 const App: React.FC = () => {
