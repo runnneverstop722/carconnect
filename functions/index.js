@@ -29,7 +29,7 @@ app.use(express.json());
 // --- Gemini API Configuration ---
 // API_KEY is set via `firebase functions:config:set env.api_key="YOUR_GEMINI_API_KEY"`
 // and will be available in process.env.API_KEY
-const GEMINI_API_KEY = process.env.API_KEY;
+const GEMINI_API_KEY = process.env.API_KEY; // Use lowercase 'api_key' here
 const MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
 
 if (!GEMINI_API_KEY) {
