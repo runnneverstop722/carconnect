@@ -46,7 +46,8 @@ if (GEMINI_API_KEY) {
 }
 
 // --- API Proxy Endpoint ---
-app.post('/fetch-car-details', async (req, res) => { // Note: path is relative to /api defined in firebase.json
+// The path '/fetch-car-details' is relative to the '/api/' rewrite in firebase.json
+app.post('/fetch-car-details', async (req, res) => {
   if (!ai) {
     console.error("Gemini AI client not initialized. Check API_KEY configuration.");
     return res.status(500).json({ error: 'AI service configuration error on server.' });
@@ -114,16 +115,17 @@ app.post('/fetch-car-details', async (req, res) => { // Note: path is relative t
       });
 
     res.setHeader('Content-Type', 'application/json');
-    res.send(result.text);
+    res.send(result.text); // Send the text part which should be the JSON string
 
   } catch (error) {
     console.error('Error calling Gemini API:', error);
     let errorMessage = 'Failed to fetch car details from AI service.';
-    if (error.message) {
+    // Check if error.message exists and append
+    if (error && error.message) {
         errorMessage += \` Details: ${error.message}\`;
     }
-    // It's unlikely to have error.response.data with the newer SDK, check error structure directly
-    // For example, error.message might contain details, or specific error types might be thrown.
+    // The structure of Gemini API errors might vary; log the whole error for detailed debugging
+    console.error("Full Gemini error object:", JSON.stringify(error, null, 2));
     res.status(500).json({ error: errorMessage });
   }
 });

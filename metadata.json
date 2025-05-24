@@ -1,5 +1,5 @@
 {
-  "name": "CarConnect MVP",
+  "name": "CarConnect",
   "description": "A mobile-first web application for car enthusiasts to find car information, share findings, and connect with dealerships. Features mock user authentication and uses Gemini API for car data retrieval.",
   "requestFramePermissions": [],
   "prompt": ""

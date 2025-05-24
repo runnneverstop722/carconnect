@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { mockLogin } from '../services/mockAuthService';
 import { User, AuthProvider } from '../types';
 import { GoogleIcon, AppleIcon, XCircleIcon, MailIcon } from './icons';
+import { APP_NAME } from '../constants'; // Import APP_NAME
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -46,8 +47,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[100]">
       <div className="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-xl w-full max-w-md transform transition-all">
         <div className="flex justify-between items-center mb-6">
-          {/* FIX: Replaced import.meta.env with process.env for environment variable access */}
-          <h2 className="text-2xl font-semibold text-white">Login to {process.env.VITE_APP_NAME || 'CarConnect'}</h2>
+          <h2 className="text-2xl font-semibold text-white">Login to {APP_NAME}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-200">
             <XCircleIcon className="h-7 w-7" />
           </button>
