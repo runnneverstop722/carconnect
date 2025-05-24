@@ -17,7 +17,7 @@ import { APP_NAME, MOCK_DEALERSHIPS } from './constants.ts';
 import { XCircleIcon, BookOpenIcon } from './components/icons.tsx';
 
 
-const App = () => {
+const App = () => { // Simplified component declaration
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   
