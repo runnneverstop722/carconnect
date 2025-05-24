@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarConnect MVP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif; /* A clean, modern font */
+    }
+    /* Custom scrollbar for a sleeker look */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #2d3748; /* gray-800 */
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4a5568; /* gray-600 */
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #718096; /* gray-500 */
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Include Babel Standalone -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 antialiased">
+  <div id="root"></div>
+  <!-- Change script type to text/babel and add data-type="module" -->
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "express": "https://esm.sh/express@^5.1.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.0.0",
+    "dotenv": "https://esm.sh/dotenv@^16.5.0",
+    "cors": "https://esm.sh/cors@^2.8.5",
+    "firebase-functions": "https://esm.sh/firebase-functions@^6.3.2",
+    "firebase-functions/": "https://esm.sh/firebase-functions@^6.3.2/"
+  }
+}
+</script>
+  <script type="text/babel" data-type="module" src="/index.tsx"></script>
+  <!-- v1.0.1 -->
+</body>
+</html>
