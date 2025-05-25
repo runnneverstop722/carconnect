@@ -64,31 +64,37 @@ const CarSearch: React.FC<CarSearchProps> = ({
     </div>
   );
 
-  const ListDisplay: React.FC<{ items?: string[]; emptyText?: string; itemClassName?: string; itemIcon?: React.ReactNode, interactive?: boolean, onItemClick?: (item: string) => void }> = 
+  const ListDisplay: React.FC<{ items?: any; emptyText?: string; itemClassName?: string; itemIcon?: React.ReactNode, interactive?: boolean, onItemClick?: (item: string) => void }> = 
   ({ items, emptyText = "Not available.", itemClassName = "bg-gray-700 p-2 rounded-md text-sm", itemIcon, interactive = false, onItemClick }) => {
-    if (!items || items.length === 0) {
+    // --- Add this crucial check: Is 'items' actually an array? ---
+    if (!items || !Array.isArray(items) || items.length === 0) { 
       return <p className="text-gray-400 text-sm italic">{emptyText}</p>;
     }
+    // --- End of crucial check ---
+
     return (
       <ul className="space-y-1 text-gray-300">
+        {/* Now we are sure 'items' is an array, so .map() is safe */}
         {items.map((item, index) => (
+          // Added checks inside map to ensure item is string if interactive
           <li 
             key={index} 
             className={`${itemClassName} flex items-start ${interactive ? 'cursor-pointer hover:bg-gray-600 transition-colors' : ''} ${itemIcon ? '' : 'pl-1'}`}
-            onClick={interactive && onItemClick ? () => onItemClick(item) : undefined}
+            onClick={interactive && onItemClick && typeof item === 'string' ? () => onItemClick(item) : undefined} // Check typeof item
             role={interactive ? 'button' : undefined}
             tabIndex={interactive ? 0 : undefined}
-            onKeyPress={interactive && onItemClick ? (e) => e.key === 'Enter' && onItemClick(item) : undefined}
-            title={interactive ? `Search for ${item}` : undefined}
+            onKeyPress={interactive && onItemClick && typeof item === 'string' ? (e) => e.key === 'Enter' && onItemClick(item) : undefined} // Check typeof item
+            title={interactive && typeof item === 'string' ? `Search for ${item}` : undefined} // Check typeof item
           >
             {itemIcon && <span className="mr-2 mt-1 flex-shrink-0">{itemIcon}</span>}
-            <span className="whitespace-pre-line">{item}</span>
+            <span className="whitespace-pre-line">{String(item)}</span> {/* Safely convert item to string */}
             {interactive && <SparklesIcon className="h-4 w-4 ml-auto text-yellow-400 self-center flex-shrink-0" />}
           </li>
         ))}
       </ul>
     );
   };
+
 
 
   return (
@@ -298,19 +304,23 @@ const CarSearch: React.FC<CarSearchProps> = ({
               </DetailSection>
             )}
 
-            {carDetails.youtubeVideos && carDetails.youtubeVideos.length > 0 && (
+            {carDetails.youtubeVideos && Array.isArray(carDetails.youtubeVideos) && carDetails.youtubeVideos.length > 0 && (
               <DetailSection title="Related YouTube Videos">
                 <div className="space-y-3">
-                  {carDetails.youtubeVideos.map((video, index) => (
+                  {/* Add Array.isArray check here before map */}
+                  {Array.isArray(carDetails.youtubeVideos) && carDetails.youtubeVideos.map((video, index) => (
+                    // Add checks to ensure video and video.url/title are valid if needed
                     <YouTubeResultCard key={index} video={video} />
                   ))}
                 </div>
               </DetailSection>
             )}
-            {(carDetails.youtubeVideos?.length === 0 && carDetails.manufacturerInfo) && ( 
-                 <DetailSection title="Related YouTube Videos">
+
+            {/* Also update the condition for the "No videos found" message */}
+            {carDetails && (!carDetails.youtubeVideos || !Array.isArray(carDetails.youtubeVideos) || carDetails.youtubeVideos.length === 0) && carDetails.manufacturerInfo && ( 
+                <DetailSection title="Related YouTube Videos">
                     <p className="text-gray-400">No YouTube videos found for this model.</p>
-                 </DetailSection>
+                </DetailSection>
             )}
           </div>
         </div>
