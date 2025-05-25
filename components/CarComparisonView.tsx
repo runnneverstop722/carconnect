@@ -77,6 +77,20 @@ const CarComparisonView: React.FC<CarComparisonViewProps> = ({ carsToCompare, on
     { title: "Pros", render: (cd: CarDetails) => renderDetail(cd.pros, true, <CheckIcon className="h-3 w-3 text-green-400" />) },
     { title: "Cons", render: (cd: CarDetails) => renderDetail(cd.cons, true, <MinusIcon className="h-3 w-3 text-red-400" />) },
     { title: "Rival Models", render: (cd: CarDetails) => renderDetail(cd.rivalModels, true) },
+    { 
+      title: "Tire Information", 
+      render: (cd: CarDetails) => {
+        if (!cd.tireInfo || (!(cd.tireInfo.size || cd.tireInfo.model || cd.tireInfo.type))) {
+          return renderDetail(undefined); // Show N/A if no tire info
+        }
+        // Combine available info into a string
+        const parts = [];
+        if(cd.tireInfo.size) parts.push(cd.tireInfo.size);
+        if(cd.tireInfo.model) parts.push(`Model: ${cd.tireInfo.model}`);
+        if(cd.tireInfo.type) parts.push(`Type: ${cd.tireInfo.type}`);
+        return renderDetail(parts.join(', '), false); // Join parts and render as a string
+      }
+    },
   ];
 
   return (

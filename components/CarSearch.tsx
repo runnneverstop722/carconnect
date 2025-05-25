@@ -206,20 +206,44 @@ const CarSearch: React.FC<CarSearchProps> = ({
 
             {carDetails.basicSpecs && (
               <DetailSection title="Basic Specifications">
-                {/* Check if basicSpecs is an object */}
                 {typeof carDetails.basicSpecs === 'object' && carDetails.basicSpecs !== null ? (
                   // If it's an object, iterate through its keys and display them
                   <ul className="space-y-1 text-gray-300">
-                    {Object.entries(carDetails.basicSpecs).map(([key, value]) => (
+                    {Object.entries(carDetails.basicSpecs).map(([key, value]) => ( // <-- This loop is key!
                       <li key={key} className="text-sm">
                         <span className="font-semibold text-blue-200">{key}:</span>{' '}
-                        <span className="whitespace-pre-line">{String(value)}</span> {/* Ensure value is treated as string for rendering */}
+                        <span className="whitespace-pre-line">{String(value)}</span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  // If it's not an object (e.g., null, string, etc.), render it as text
-                  <p className="text-gray-300 whitespace-pre-line">{String(carDetails.basicSpecs || '')}</p> // Use String() and fallback for safety
+                  // If it's not an object, render it as text
+                  <p className="text-gray-300 whitespace-pre-line">{String(carDetails.basicSpecs || '')}</p>
+                )}
+              </DetailSection>
+            )}
+
+            {/* Add the new Tire Information section here */}
+            {carDetails.tireInfo && (carDetails.tireInfo.size || carDetails.tireInfo.model || carDetails.tireInfo.type) && (
+              <DetailSection title="Tire Information" icon={<WrenchScrewdriverIcon className="h-5 w-5 text-blue-300" />}> {/* Re-using wrench icon, or find a wheel icon */}
+                {carDetails.tireInfo.size && (
+                  <p className="text-gray-300 text-sm mb-1">
+                    <span className="font-semibold text-blue-200">Size:</span> {carDetails.tireInfo.size}
+                  </p>
+                )}
+                {carDetails.tireInfo.model && (
+                  <p className="text-gray-300 text-sm mb-1">
+                    <span className="font-semibold text-blue-200">Model:</span> {carDetails.tireInfo.model}
+                  </p>
+                )}
+                {carDetails.tireInfo.type && (
+                  <p className="text-gray-300 text-sm">
+                    <span className="font-semibold text-blue-200">Type:</span> {carDetails.tireInfo.type}
+                  </p>
+                )}
+                {/* Handle cases where tireInfo exists but is empty or only has some fields */}
+                {!(carDetails.tireInfo.size || carDetails.tireInfo.model || carDetails.tireInfo.type) && (
+                    <p className="text-gray-400 text-sm italic">Tire information not available.</p>
                 )}
               </DetailSection>
             )}

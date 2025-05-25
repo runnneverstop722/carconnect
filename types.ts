@@ -18,18 +18,26 @@ export interface ManufacturerInfo {
 export interface CarDetails {
   youtubeVideos?: YouTubeVideo[];
   manufacturerInfo?: ManufacturerInfo;
-  basicSpecs?: string;
+  basicSpecs?: string | object | null; // Keep this as it is, but backend should aim for object structure
+  marketPresence?: string | null;
+  userReviewSentiment?: string | null;
+  imageDescriptions?: string[];
   uniqueFeatures?: string[];
+  maintenanceSummary?: string | null;
+  recallNotices?: string[];
   pros?: string[];
   cons?: string[];
   rivalModels?: string[];
-  imageDescriptions?: string[];
-  marketPresence?: string;
-  maintenanceSummary?: string; 
-  recallNotices?: string[];    
-  userReviewSentiment?: string; 
-  buildAndPriceUrl?: string;   
-  ownersManualLink?: string;   // New: For link to digital owner's manual
+  youtubeVideos?: { title: string; url: string; thumbnailUrl?: string; }[];
+  manufacturerInfo?: { name: string; homepage?: string; };
+  buildAndPriceUrl?: string | null;
+  // Add this new property:
+  tireInfo?: {
+    size?: string; // e.g., "235/45R18"
+    model?: string; // e.g., "Michelin Pilot Sport 4" (optional, might be hard to get consistently)
+    type?: string; // e.g., "All-season", "Performance" (optional)
+  } | null; // Make the whole tireInfo object optional and potentially null
+  ownersManualLink?: string | null;
 }
 
 // Represents a car search result stored in history
