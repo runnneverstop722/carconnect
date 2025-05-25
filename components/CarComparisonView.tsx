@@ -23,8 +23,12 @@ const CarComparisonView: React.FC<CarComparisonViewProps> = ({ carsToCompare, on
     );
   }
 
-  const renderDetail = (detail: string | string[] | undefined, isList: boolean = false, itemIcon?: React.ReactNode) => {
-    if (!detail) return <span className="text-gray-500 italic text-xs">N/A</span>;
+  const renderDetail = (detail: string | string[] | object | undefined, isList: boolean = false, itemIcon?: React.ReactNode) => {
+    if (!detail) {
+      return <span className="text-gray-500 italic text-xs">N/A</span>;
+    }
+
+    // Handle arrays (like pros, cons, etc.)
     if (isList && Array.isArray(detail)) {
       if (detail.length === 0) return <span className="text-gray-500 italic text-xs">None listed</span>;
       return (
@@ -38,6 +42,29 @@ const CarComparisonView: React.FC<CarComparisonViewProps> = ({ carsToCompare, on
         </ul>
       );
     }
+    // Add a check for the specific basicSpecs object structure
+    // You might need to adjust the type check based on the exact structure of CarDetails['basicSpecs']
+    if (typeof detail === 'object' && detail !== null && !Array.isArray(detail)) {
+        const specs = detail as Record<string, string>; // Assuming it's a simple key-value object
+        const specKeys = Object.keys(specs);
+
+        if (specKeys.length === 0) {
+            return <span className="text-gray-500 italic text-xs">No specs listed</span>;
+        }
+
+        return (
+            <ul className="list-none space-y-1 text-xs">
+                {specKeys.map(key => (
+                    <li key={key} className="flex items-start">
+                        {/* Format each key-value pair, e.g., "Engine Type: ..." */}
+                        <span className="font-medium text-gray-400 capitalize mr-1">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                        <span className="text-gray-300 whitespace-pre-line">{specs[key]}</span>
+                    </li>
+                ))}
+            </ul>
+        );
+    }
+    // Handle simple strings
     return <p className="text-gray-300 text-xs whitespace-pre-line">{String(detail)}</p>;
   };
 
