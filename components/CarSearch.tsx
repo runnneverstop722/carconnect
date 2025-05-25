@@ -200,7 +200,21 @@ const CarSearch: React.FC<CarSearchProps> = ({
 
             {carDetails.basicSpecs && (
               <DetailSection title="Basic Specifications">
-                <p className="text-gray-300 whitespace-pre-line">{carDetails.basicSpecs}</p>
+                {/* Check if basicSpecs is an object */}
+                {typeof carDetails.basicSpecs === 'object' && carDetails.basicSpecs !== null ? (
+                  // If it's an object, iterate through its keys and display them
+                  <ul className="space-y-1 text-gray-300">
+                    {Object.entries(carDetails.basicSpecs).map(([key, value]) => (
+                      <li key={key} className="text-sm">
+                        <span className="font-semibold text-blue-200">{key}:</span>{' '}
+                        <span className="whitespace-pre-line">{String(value)}</span> {/* Ensure value is treated as string for rendering */}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  // If it's not an object (e.g., null, string, etc.), render it as text
+                  <p className="text-gray-300 whitespace-pre-line">{String(carDetails.basicSpecs || '')}</p> // Use String() and fallback for safety
+                )}
               </DetailSection>
             )}
             
