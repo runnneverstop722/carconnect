@@ -4,36 +4,35 @@ import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import cors from 'cors';
 // Import onRequest from the V2 SDK
-import {onRequest} from 'firebase-functions/v2/https';
+import { onRequest } from 'firebase-functions/v2/https';
+// Import fetch for making HTTP requests
+import fetch from 'node-fetch';
+
 
 // Load environment variables from .env file for local development (Firebase Emulator)
-// For deployed functions, Firebase sets these variables from `firebase functions:config:set` into process.env
 dotenv.config();
+
 
 const app = express();
 
 // --- CORS Configuration ---
-// For deployed function, FRONTEND_URL is set via `firebase functions:config:set env.frontend_url="https://your-project-id.web.app"`
-// and will be available in process.env.FRONTEND_URL
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Allow localhost for local dev/emulator
-  optionsSuccessStatus: 200 
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Allow localhost for local dev/emulator, and your deployed frontend URL
+  optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
-console.log(`CORS configured for origin: ${process.env.FRONTEND_URL || 'http://localhost:3000 (fallback)'}`);
+console.log(`CORS configured for origin: ${process.env.FRONTEND_URL || 'http://localhost:3000 (fallback for local)'}`);
 
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
 // --- Gemini API Configuration ---
-// API_KEY is set via `firebase functions:config:set env.api_key="YOUR_GEMINI_API_KEY"`
-// and will be available in process.env.API_KEY
-const GEMINI_API_KEY = process.env.API_KEY; // Use lowercase 'api_key' here
+const GEMINI_API_KEY = process.env.API_KEY;
 const MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
 
 if (!GEMINI_API_KEY) {
-  console.error("CRITICAL: Gemini API key (process.env.API_KEY) not found in server environment variables.");
+  console.error("CRITICAL: Gemini API key (process.env.API_KEY) not found in server environment variables. AI features will not work.");
 }
 
 let ai;
@@ -49,32 +48,41 @@ if (GEMINI_API_KEY) {
   console.warn("Gemini AI client not initialized because API_KEY is missing.");
 }
 
-// --- API Proxy Endpoint ---
-// The path '/fetch-car-details' is relative to the '/api/' rewrite in firebase.json
-app.post('/api/fetch-car-details', async (req, res) => {
-  if (!ai) {
-    console.error("Gemini AI client not initialized. Check API_KEY configuration.");
-    return res.status(500).json({ error: 'AI service configuration error on server.' });
-  }
+// --- Google Custom Search API Configuration ---
+// Ensure these exact names (IMAGE_SEARCH_API_KEY, IMAGE_SEARCH_CX_ID) are used when setting Firebase environment variables.
+const GOOGLE_SEARCH_API_KEY = process.env.IMAGE_SEARCH_API_KEY; 
+const GOOGLE_SEARCH_CX_ID = process.env.IMAGE_SEARCH_CX_ID;     
 
+if (!GOOGLE_SEARCH_API_KEY || !GOOGLE_SEARCH_CX_ID) {
+  console.warn("Warning: Google Custom Search API keys (IMAGE_SEARCH_API_KEY, IMAGE_SEARCH_CX_ID) not found in server environment variables. Image search will not work.");
+}
+
+
+// --- API Proxy Endpoint ---
+app.post('/api/fetch-car-details', async (req, res) => {
   const { carModel, userLanguage } = req.body;
 
   if (!carModel) {
     return res.status(400).json({ error: 'carModel is required in the request body' });
   }
 
-  const languageInstruction = userLanguage
-    ? `Please provide the response in ${userLanguage} if possible. If not, please use English.`
-    : "Provide general information in English.";
+  // --- Part 1: Call Gemini for Text Details ---
+  let parsedGeminiData = {};
+  let rawGeminiText = ''; 
+  
+  if (ai) {
+    const languageInstruction = userLanguage
+      ? `Please provide the response in ${userLanguage} if possible. If not, please use English.`
+      : "Provide general information in English.";
 
-  const prompt = `
+    const prompt = `
     For the car model "${carModel}", ${languageInstruction} Provide detailed information for the following aspects.
     If a piece of information is not available or applicable, clearly state "Not available" or omit the field for lists/objects.
     Focus on models typically sold in a region that primarily uses ${userLanguage || 'English'}, if regional variations exist.
 
     1.  **YouTube Videos**: List up to 3 relevant YouTube video titles and their full URLs (reviews, official ads, walkarounds).
     2.  **Manufacturer Info**: Provide the manufacturer's name and official homepage URL.
-    3.  **Basic Specifications**: Provide key general specifications as a JSON object. Include keys for: "Engine Type", "Power (hp or kW)", "Torque (lb-ft or Nm)", "Transmission", "Drivetrain", "Fuel Economy (combined, MPG or L/100km)", "Length", "Width (specify if with/without mirrors)", "Height", "Wheelbase", "Curb Weight". If a specific detail is not available, set its value to "Not available".
+    3.  **Basic Specifications**: Provide key general specifications as a JSON object. Include keys for: "Engine Type", "Power (hp or kW)", "Torque (lb-ft or Nm)", "Transmission", "Drivetrain", "Fuel Economy (combined, MPG or L/100km)", "Length", "Width (specify if with/without mirrors)", "Height", "Wheelbase", "Curb Weight", "Cargo Volume". If a specific detail is not available, set its value to "Not available".
     4.  **Tire Information**: Provide tire specifications as a JSON object. Include keys for: "size" (e.g., "235/45R18" - note if front/rear sizes differ), "model" (the specific tire model name, if commonly known), and "type" (e.g., "All-season", "Performance"). If any detail is not available, set its value to "Not available" or omit the key if the entire object is empty.
     5.  **Unique Features**: Bullet list of 3-5 standout or unique features of this model.
     6.  **Pros**: Bullet list of 3-5 common praises or advantages.
@@ -93,7 +101,7 @@ app.post('/api/fetch-car-details', async (req, res) => {
       "youtube_videos": [{ "title": "Example Review", "url": "https://youtube.com/example" }],
       "manufacturer_name": "ExampleCarCorp",
       "manufacturer_homepage": "https://examplecarcorp.com",
-      "basic_specs": { // <-- Now an object!
+      "basic_specs": {
         "Engine Type": "2.0L Turbo",
         "Power (hp or kW)": "250hp",
         "Torque (lb-ft or Nm)": "270 lb-ft",
@@ -104,9 +112,10 @@ app.post('/api/fetch-car-details', async (req, res) => {
         "Width (specify if with/without mirrors)": "1850mm (excluding mirrors)",
         "Height": "1450 mm",
         "Wheelbase": "2700 mm",
-        "Curb Weight": "1500 kg"
+        "Curb Weight": "1500 kg",
+        "Cargo Volume": "450 L"
       },
-      "tire_info": { // <-- New object!
+      "tire_info": {
         "size": "225/50R17",
         "model": "Goodyear Assurance",
         "type": "All-season"
@@ -127,31 +136,95 @@ app.post('/api/fetch-car-details', async (req, res) => {
     For lists like 'recall_notices', if none are found, return an empty list [] or omit the key. If an object like 'tire_info' has no available details, omit the key or return an empty object {}.
   `;
 
-  try {
-    const result = await ai.models.generateContent({
-        model: MODEL_NAME,
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        config: {
-          responseMimeType: "application/json",
-        },
-      });
+    try {
+        const result = await ai.models.generateContent({
+            model: MODEL_NAME,
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            config: {
+              responseMimeType: "application/json",
+            },
+          });
 
-    res.setHeader('Content-Type', 'application/json');
-    res.send(result.text); // Send the text part which should be the JSON string
-
-  } catch (error) {
-    console.error('Error calling Gemini API:', error);
-    let errorMessage = 'Failed to fetch car details from AI service.';
-    // Check if error.message exists and append
-    if (error && error.message) {
-        errorMessage += ` Details: ${error.message}`;
+        rawGeminiText = result.text;
+        let jsonStr = rawGeminiText.trim();
+        const fenceRegex = /^```json\s*\n?(.*?)\n?\s*```$/s;
+        const match = jsonStr.match(fenceRegex);
+        if (match && match[1]) {
+          jsonStr = match[1].trim();
+        }
+        parsedGeminiData = JSON.parse(jsonStr);
+        
+    } catch (error) {
+      console.error('Error calling Gemini API or parsing its response:', error);
+      if (error instanceof Error) {
+        console.error("Gemini Error Message:", error.message);
+      }
+      console.error("Raw Gemini response text (if available and led to parse error):", rawGeminiText);
+      // parsedGeminiData remains {}
     }
-    // The structure of Gemini API errors might vary; log the whole error for detailed debugging
-    console.error("Full Gemini error object:", JSON.stringify(error, null, 2));
-    res.status(500).json({ error: errorMessage });
+  } else {
+      console.warn("Gemini AI client not initialized. Skipping Gemini API call.");
   }
+
+  // --- Part 2: Call Image Search API ---
+  let imageUrls = [];
+  if (GOOGLE_SEARCH_API_KEY && GOOGLE_SEARCH_CX_ID) {
+    try {
+      const searchQuery = `${carModel} car exterior official photo`; 
+      const numImages = 5; 
+      const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_CX_ID}&q=${encodeURIComponent(searchQuery)}&searchType=image&num=${numImages}&safe=active&imgSize=large`;
+
+      const searchResponse = await fetch(searchUrl);
+      if (!searchResponse.ok) {
+        const errorBody = await searchResponse.text();
+        console.error(`Image search API error: ${searchResponse.status} ${searchResponse.statusText}`, errorBody);
+      } else {
+         const searchData = await searchResponse.json();
+        if (searchData.items && Array.isArray(searchData.items)) {
+          imageUrls = searchData.items.map(item => item.link).filter(link => typeof link === 'string');
+          console.log(`Successfully found ${imageUrls.length} image URLs.`);
+        } else {
+            console.warn("Image search response items not found or not an array.");
+        }
+      }
+    } catch (error) {
+      console.error('Error calling Google Custom Search API:', error);
+    }
+  } else {
+      console.warn("Image search skipped because API keys (IMAGE_SEARCH_API_KEY, IMAGE_SEARCH_CX_ID) are not configured.");
+  }
+
+
+  // --- Part 3: Combine Results and Send to Frontend ---
+  const finalCarDetailsResponse = {
+      youtube_videos: Array.isArray(parsedGeminiData?.youtube_videos) ? parsedGeminiData.youtube_videos : [],
+      manufacturer_name: parsedGeminiData?.manufacturer_name || carModel.split(" ")[0] || "Unknown Manufacturer",
+      manufacturer_homepage: parsedGeminiData?.manufacturer_homepage || "#",
+      basic_specs: parsedGeminiData?.basic_specs && typeof parsedGeminiData.basic_specs === 'object' ? parsedGeminiData.basic_specs : null,
+      tire_info: parsedGeminiData?.tire_info && typeof parsedGeminiData.tire_info === 'object' ? parsedGeminiData.tire_info : null,
+      unique_features: Array.isArray(parsedGeminiData?.unique_features) ? parsedGeminiData.unique_features : [],
+      pros: Array.isArray(parsedGeminiData?.pros) ? parsedGeminiData.pros : [],
+      cons: Array.isArray(parsedGeminiData?.cons) ? parsedGeminiData.cons : [],
+      rival_models: Array.isArray(parsedGeminiData?.rival_models) ? parsedGeminiData.rival_models : [],
+      image_descriptions: Array.isArray(parsedGeminiData?.image_descriptions) ? parsedGeminiData.image_descriptions : [],
+      market_presence: parsedGeminiData?.market_presence || null,
+      maintenance_summary: parsedGeminiData?.maintenance_summary || null,
+      recall_notices: Array.isArray(parsedGeminiData?.recall_notices) ? parsedGeminiData.recall_notices : [],
+      user_review_sentiment: parsedGeminiData?.user_review_sentiment || null,
+      build_and_price_url: parsedGeminiData?.build_and_price_url || null,
+      owners_manual_link: parsedGeminiData?.owners_manual_link || null,
+      image_urls: imageUrls, // imageUrls defaults to [] if image search fails or is skipped
+  };
+
+  res.setHeader('Content-Type', 'application/json');
+  res.status(200).json(finalCarDetailsResponse);
 });
 
-// Expose Express API as a single Cloud Function using V2 onRequest:
-// The name 'api' here must match the function name in firebase.json rewrites.
-export const api = onRequest(app);
+export const api = onRequest(
+  {
+    // region: 'us-central1', 
+    // memory: '256MiB', 
+    // timeoutSeconds: 60, 
+  },
+  app
+);

@@ -7,7 +7,7 @@ import ShareContentButton from './ShareContentButton.tsx';
 import { 
   SearchIcon, XCircleIcon, HeartIcon, HeartOutlineIcon, GlobeAsiaAustraliaIcon, 
   SparklesIcon, CameraIcon, WrenchScrewdriverIcon, ExclamationTriangleIcon,
-  ChatBubbleLeftEllipsisIcon, CurrencyDollarIcon, BookOpenIcon // Added BookOpenIcon
+  ChatBubbleLeftEllipsisIcon, CurrencyDollarIcon, BookOpenIcon 
 } from './icons.tsx'; 
 
 interface CarSearchProps {
@@ -51,7 +51,7 @@ const CarSearch: React.FC<CarSearchProps> = ({
   const isCarLiked = (modelName: string | undefined) => modelName ? likedCars.includes(modelName) : false;
 
   const shareableContent = carDetails && currentSearchedModelForLike && carDetails.manufacturerInfo
-    ? `Check out info for ${currentSearchedModelForLike} on CarConnect:\nManufacturer: ${carDetails.manufacturerInfo.name} (${carDetails.manufacturerInfo.homepage})\nSpecs: ${carDetails.basicSpecs || 'N/A'}\nMarket Presence: ${carDetails.marketPresence || 'N/A'}\nSentiment: ${carDetails.userReviewSentiment || 'N/A'}\nYouTube: ${carDetails.youtubeVideos && carDetails.youtubeVideos.length > 0 ? carDetails.youtubeVideos[0].url : 'N/A'}`
+    ? `Check out info for ${currentSearchedModelForLike} on CarConnect:\nManufacturer: ${carDetails.manufacturerInfo.name} (${carDetails.manufacturerInfo.homepage})\nSpecs: ${typeof carDetails.basicSpecs === 'string' ? carDetails.basicSpecs : 'See details'} \nMarket Presence: ${carDetails.marketPresence || 'N/A'}\nSentiment: ${carDetails.userReviewSentiment || 'N/A'}\nYouTube: ${carDetails.youtubeVideos && Array.isArray(carDetails.youtubeVideos) && carDetails.youtubeVideos.length > 0 ? carDetails.youtubeVideos[0].url : 'N/A'}`
     : `Search for cars on CarConnect!`;
 
   const DetailSection: React.FC<{ title: string; children: React.ReactNode; className?: string; icon?: React.ReactNode }> = ({ title, children, className, icon }) => (
@@ -66,36 +66,30 @@ const CarSearch: React.FC<CarSearchProps> = ({
 
   const ListDisplay: React.FC<{ items?: any; emptyText?: string; itemClassName?: string; itemIcon?: React.ReactNode, interactive?: boolean, onItemClick?: (item: string) => void }> = 
   ({ items, emptyText = "Not available.", itemClassName = "bg-gray-700 p-2 rounded-md text-sm", itemIcon, interactive = false, onItemClick }) => {
-    // --- Add this crucial check: Is 'items' actually an array? ---
     if (!items || !Array.isArray(items) || items.length === 0) { 
       return <p className="text-gray-400 text-sm italic">{emptyText}</p>;
     }
-    // --- End of crucial check ---
 
     return (
       <ul className="space-y-1 text-gray-300">
-        {/* Now we are sure 'items' is an array, so .map() is safe */}
         {items.map((item, index) => (
-          // Added checks inside map to ensure item is string if interactive
           <li 
             key={index} 
             className={`${itemClassName} flex items-start ${interactive ? 'cursor-pointer hover:bg-gray-600 transition-colors' : ''} ${itemIcon ? '' : 'pl-1'}`}
-            onClick={interactive && onItemClick && typeof item === 'string' ? () => onItemClick(item) : undefined} // Check typeof item
+            onClick={interactive && onItemClick && typeof item === 'string' ? () => onItemClick(item) : undefined} 
             role={interactive ? 'button' : undefined}
             tabIndex={interactive ? 0 : undefined}
-            onKeyPress={interactive && onItemClick && typeof item === 'string' ? (e) => e.key === 'Enter' && onItemClick(item) : undefined} // Check typeof item
-            title={interactive && typeof item === 'string' ? `Search for ${item}` : undefined} // Check typeof item
+            onKeyPress={interactive && onItemClick && typeof item === 'string' ? (e) => e.key === 'Enter' && onItemClick(item) : undefined} 
+            title={interactive && typeof item === 'string' ? `Search for ${item}` : undefined} 
           >
             {itemIcon && <span className="mr-2 mt-1 flex-shrink-0">{itemIcon}</span>}
-            <span className="whitespace-pre-line">{String(item)}</span> {/* Safely convert item to string */}
+            <span className="whitespace-pre-line">{String(item)}</span> 
             {interactive && <SparklesIcon className="h-4 w-4 ml-auto text-yellow-400 self-center flex-shrink-0" />}
           </li>
         ))}
       </ul>
     );
   };
-
-
 
   return (
     <div className="space-y-6">
@@ -191,7 +185,6 @@ const CarSearch: React.FC<CarSearchProps> = ({
               )}
             </div>
 
-
             {carDetails.marketPresence && (
               <DetailSection title="Market Snapshot" icon={<GlobeAsiaAustraliaIcon className="h-5 w-5 text-blue-300" />}>
                 <p className="text-gray-300 italic">{carDetails.marketPresence}</p>
@@ -207,25 +200,22 @@ const CarSearch: React.FC<CarSearchProps> = ({
             {carDetails.basicSpecs && (
               <DetailSection title="Basic Specifications">
                 {typeof carDetails.basicSpecs === 'object' && carDetails.basicSpecs !== null ? (
-                  // If it's an object, iterate through its keys and display them
                   <ul className="space-y-1 text-gray-300">
-                    {Object.entries(carDetails.basicSpecs).map(([key, value]) => ( // <-- This loop is key!
+                    {Object.entries(carDetails.basicSpecs).map(([key, value]) => ( 
                       <li key={key} className="text-sm">
-                        <span className="font-semibold text-blue-200">{key}:</span>{' '}
+                        <span className="font-semibold text-blue-200 capitalize">{key.replace(/([A-Z]+(?=[A-Z][a-z])|[A-Z](?=[a-z]))/g, ' $1').trim()}:</span>{' '}
                         <span className="whitespace-pre-line">{String(value)}</span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  // If it's not an object, render it as text
                   <p className="text-gray-300 whitespace-pre-line">{String(carDetails.basicSpecs || '')}</p>
                 )}
               </DetailSection>
             )}
 
-            {/* Add the new Tire Information section here */}
             {carDetails.tireInfo && (carDetails.tireInfo.size || carDetails.tireInfo.model || carDetails.tireInfo.type) && (
-              <DetailSection title="Tire Information" icon={<WrenchScrewdriverIcon className="h-5 w-5 text-blue-300" />}> {/* Re-using wrench icon, or find a wheel icon */}
+              <DetailSection title="Tire Information" icon={<WrenchScrewdriverIcon className="h-5 w-5 text-blue-300" />}>
                 {carDetails.tireInfo.size && (
                   <p className="text-gray-300 text-sm mb-1">
                     <span className="font-semibold text-blue-200">Size:</span> {carDetails.tireInfo.size}
@@ -241,7 +231,6 @@ const CarSearch: React.FC<CarSearchProps> = ({
                     <span className="font-semibold text-blue-200">Type:</span> {carDetails.tireInfo.type}
                   </p>
                 )}
-                {/* Handle cases where tireInfo exists but is empty or only has some fields */}
                 {!(carDetails.tireInfo.size || carDetails.tireInfo.model || carDetails.tireInfo.type) && (
                     <p className="text-gray-400 text-sm italic">Tire information not available.</p>
                 )}
@@ -258,6 +247,27 @@ const CarSearch: React.FC<CarSearchProps> = ({
                 />
               </DetailSection>
             )}
+
+            {/* Updated Image Gallery Section */}
+            {carDetails.imageUrls && carDetails.imageUrls.length > 0 && (
+              <DetailSection title="Image Gallery" icon={<CameraIcon className="h-5 w-5 text-blue-300" />}>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {carDetails.imageUrls.map((url, index) => (
+                    <div key={index} className="aspect-video bg-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+                      <img 
+                        src={url} 
+                        alt={ (carDetails.imageDescriptions && carDetails.imageDescriptions[index]) ? carDetails.imageDescriptions[index] : `${activeSearch.modelName} image ${index + 1}` }
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+                </div>
+                 <p className="text-xs text-gray-500 mt-2 text-center">Images provided by Google Custom Search.</p>
+              </DetailSection>
+            )}
+            {/* End of Updated Image Gallery Section */}
+
 
             {carDetails.uniqueFeatures && carDetails.uniqueFeatures.length > 0 && (
               <DetailSection title="Unique Features">
@@ -295,13 +305,12 @@ const CarSearch: React.FC<CarSearchProps> = ({
                  <p className="text-xs text-gray-500 mt-2">Note: Always verify recall information with official manufacturer or government safety agency websites.</p>
               </DetailSection>
             )}
-             {carDetails.recallNotices && carDetails.recallNotices.length === 0 && carDetails.manufacturerInfo && ( // Show if no recalls but other info is present
+             {carDetails.recallNotices && carDetails.recallNotices.length === 0 && carDetails.manufacturerInfo && ( 
                 <DetailSection title="Recall Information" icon={<ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" />}>
                      <p className="text-gray-400 text-sm italic">No specific recall notices found by the AI for this model at this time.</p>
                      <p className="text-xs text-gray-500 mt-2">Note: Always verify recall information with official manufacturer or government safety agency websites.</p>
                 </DetailSection>
             )}
-
 
             <div className="grid md:grid-cols-2 gap-6">
               {carDetails.pros && carDetails.pros.length > 0 && (
@@ -331,16 +340,13 @@ const CarSearch: React.FC<CarSearchProps> = ({
             {carDetails.youtubeVideos && Array.isArray(carDetails.youtubeVideos) && carDetails.youtubeVideos.length > 0 && (
               <DetailSection title="Related YouTube Videos">
                 <div className="space-y-3">
-                  {/* Add Array.isArray check here before map */}
                   {Array.isArray(carDetails.youtubeVideos) && carDetails.youtubeVideos.map((video, index) => (
-                    // Add checks to ensure video and video.url/title are valid if needed
                     <YouTubeResultCard key={index} video={video} />
                   ))}
                 </div>
               </DetailSection>
             )}
 
-            {/* Also update the condition for the "No videos found" message */}
             {carDetails && (!carDetails.youtubeVideos || !Array.isArray(carDetails.youtubeVideos) || carDetails.youtubeVideos.length === 0) && carDetails.manufacturerInfo && ( 
                 <DetailSection title="Related YouTube Videos">
                     <p className="text-gray-400">No YouTube videos found for this model.</p>

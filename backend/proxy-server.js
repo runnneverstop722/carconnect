@@ -70,7 +70,7 @@ app.post('/api/fetch-car-details', async (req, res) => {
 
   1.  **YouTube Videos**: List up to 3 relevant YouTube video titles and their full URLs (reviews, official ads, walkarounds).
   2.  **Manufacturer Info**: Provide the manufacturer's name and official homepage URL.
-  3.  **Basic Specifications**: Provide key general specifications as a JSON object. Include keys for: "Engine Type", "Power (hp or kW)", "Torque (lb-ft or Nm)", "Transmission", "Drivetrain", "Fuel Economy (combined, MPG or L/100km)", "Length", "Width (specify if with/without mirrors)", "Height", "Wheelbase", "Curb Weight". If a specific detail is not available, set its value to "Not available".
+  3.  **Basic Specifications**: Provide key general specifications as a JSON object. Include keys for: "Engine Type", "Power (hp or kW)", "Torque (lb-ft or Nm)", "Transmission", "Drivetrain", "Fuel Economy (combined, MPG or L/100km)", "Length", "Width (specify if with/without mirrors)", "Height", "Wheelbase", "Curb Weight", "Cargo Volume". If a specific detail is not available, set its value to "Not available".
   4.  **Tire Information**: Provide tire specifications as a JSON object. Include keys for: "size" (e.g., "235/45R18" - note if front/rear sizes differ), "model" (the specific tire model name, if commonly known), and "type" (e.g., "All-season", "Performance"). If any detail is not available, set its value to "Not available" or omit the key if the entire object is empty.
   5.  **Unique Features**: Bullet list of 3-5 standout or unique features of this model.
   6.  **Pros**: Bullet list of 3-5 common praises or advantages.
@@ -89,7 +89,7 @@ app.post('/api/fetch-car-details', async (req, res) => {
     "youtube_videos": [{ "title": "Example Review", "url": "https://youtube.com/example" }],
     "manufacturer_name": "ExampleCarCorp",
     "manufacturer_homepage": "https://examplecarcorp.com",
-    "basic_specs": { // <-- Now an object!
+    "basic_specs": {
       "Engine Type": "2.0L Turbo",
       "Power (hp or kW)": "250hp",
       "Torque (lb-ft or Nm)": "270 lb-ft",
@@ -100,9 +100,10 @@ app.post('/api/fetch-car-details', async (req, res) => {
       "Width (specify if with/without mirrors)": "1850mm (excluding mirrors)",
       "Height": "1450 mm",
       "Wheelbase": "2700 mm",
-      "Curb Weight": "1500 kg"
+      "Curb Weight": "1500 kg",
+      "Cargo Volume": "450 L" 
     },
-    "tire_info": { // <-- New object!
+    "tire_info": { 
       "size": "225/50R17",
       "model": "Goodyear Assurance",
       "type": "All-season"
@@ -141,9 +142,9 @@ app.post('/api/fetch-car-details', async (req, res) => {
     if (error.message) {
         errorMessage += ` Details: ${error.message}`;
     }
-    if (error.response && error.response.data && error.response.data.error) {
-        errorMessage += ` Gemini Error: ${error.response.data.error.message}`;
-    }
+    // The @google/genai library might not use error.response.data like axios.
+    // Check the structure of errors from @google/genai if more specific details are needed.
+    // For now, error.message should contain the primary error info.
     res.status(500).json({ error: errorMessage });
   }
 });

@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -18,26 +19,24 @@ export interface ManufacturerInfo {
 export interface CarDetails {
   youtubeVideos?: YouTubeVideo[];
   manufacturerInfo?: ManufacturerInfo;
-  basicSpecs?: string | object | null; // Keep this as it is, but backend should aim for object structure
+  basicSpecs?: { [key: string]: string | null | undefined } | null; 
   marketPresence?: string | null;
   userReviewSentiment?: string | null;
-  imageDescriptions?: string[];
+  imageDescriptions?: string[]; // Textual descriptions from Gemini
+  imageUrls?: string[]; // URLs for actual images from Google Search
   uniqueFeatures?: string[];
   maintenanceSummary?: string | null;
   recallNotices?: string[];
   pros?: string[];
   cons?: string[];
   rivalModels?: string[];
-  youtubeVideos?: { title: string; url: string; thumbnailUrl?: string; }[];
-  manufacturerInfo?: { name: string; homepage?: string; };
   buildAndPriceUrl?: string | null;
-  // Add this new property:
-  tireInfo?: {
-    size?: string; // e.g., "235/45R18"
-    model?: string; // e.g., "Michelin Pilot Sport 4" (optional, might be hard to get consistently)
-    type?: string; // e.g., "All-season", "Performance" (optional)
-  } | null; // Make the whole tireInfo object optional and potentially null
   ownersManualLink?: string | null;
+  tireInfo?: {
+    size?: string | null | undefined; 
+    model?: string | null | undefined; 
+    type?: string | null | undefined; 
+  } | null;
 }
 
 // Represents a car search result stored in history
