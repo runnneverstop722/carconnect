@@ -1,21 +1,17 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar.tsx';
 import LoginModal from './components/LoginModal.tsx';
 import CarSearch from './components/CarSearch.tsx';
-import DealershipEmailer from './components/DealershipEmailer.tsx';
 import LikedCarsList from './components/LikedCarsList.tsx';
-import DealershipLocator from './components/DealershipLocator.tsx';
 import Footer from './components/Footer.tsx';
-import SearchHistoryList from './components/SearchHistoryList.tsx'; // New
-import CarComparisonView from './components/CarComparisonView.tsx'; // New
-import CarTypesGuide from './components/CarTypesGuide.tsx'; // New
+import SearchHistoryList from './components/SearchHistoryList.tsx';
+import CarComparisonView from './components/CarComparisonView.tsx';
+import CarTypesGuide from './components/CarTypesGuide.tsx';
 import { User, LikedCar, HistoricCarSearch, CarDetails } from './types.ts';
 import { mockLogout } from './services/mockAuthService.ts';
 import { fetchCarDetailsFromGemini } from './services/geminiService.ts';
-import { APP_NAME, MOCK_DEALERSHIPS } from './constants.ts';
+import { APP_NAME } from './constants.ts';
 import { XCircleIcon, BookOpenIcon } from './components/icons.tsx';
-
 
 const App = () => { 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -27,8 +23,7 @@ const App = () => {
   const [carSearchError, setCarSearchError] = useState<string | null>(null);
   
   const [likedCars, setLikedCars] = useState<Array<LikedCar>>([]);
-  const [modelForDealershipSearch, setModelForDealershipSearch] = useState<string | null>(null);
-
+  
   const [comparisonList, setComparisonList] = useState<Array<HistoricCarSearch>>([]);
   const [isComparisonViewActive, setIsComparisonViewActive] = useState(false);
   const [isCarTypesGuideOpen, setIsCarTypesGuideOpen] = useState(false);
@@ -48,12 +43,12 @@ const App = () => {
     } catch (e) { localStorage.removeItem('carConnectHistoricSearches'); }
   }, []);
 
-  const saveHistoricSearches = (searches) => {
+  const saveHistoricSearches = (searches: Array<HistoricCarSearch>) => {
     setHistoricSearches(searches);
     localStorage.setItem('carConnectHistoricSearches', JSON.stringify(searches));
   };
 
-  const handleLoginSuccess = useCallback((user) => {
+  const handleLoginSuccess = useCallback((user: User) => {
     setCurrentUser(user);
     localStorage.setItem('carConnectUser', JSON.stringify(user));
     setIsLoginModalOpen(false);
@@ -65,7 +60,7 @@ const App = () => {
     localStorage.removeItem('carConnectUser');
   }, []);
   
-  const handleInitiateSearch = useCallback(async (modelName) => {
+  const handleInitiateSearch = useCallback(async (modelName: string) => {
     if (!modelName.trim()) {
       setCarSearchError("Please enter a car model.");
       return;
@@ -73,7 +68,6 @@ const App = () => {
     setIsCarSearchLoading(true);
     setCarSearchError(null);
     setActiveSearch(null); 
-    setModelForDealershipSearch(null); 
     setIsComparisonViewActive(false); 
 
     const userLang = navigator.language || 'en';
@@ -116,10 +110,9 @@ const App = () => {
     }
   }, []);
 
-  const handleSelectHistoricSearch = (search) => {
+  const handleSelectHistoricSearch = (search: HistoricCarSearch) => {
     setActiveSearch(search);
     setCarSearchError(null); 
-    setModelForDealershipSearch(null);
     setIsComparisonViewActive(false);
     const searchResultsElement = document.getElementById('car-search-results-area');
     if (searchResultsElement) {
@@ -137,7 +130,7 @@ const App = () => {
   };
 
 
-  const handleToggleLikeCar = useCallback((modelName) => {
+  const handleToggleLikeCar = useCallback((modelName: string) => {
     setLikedCars(prevLikedCars => {
       const isLiked = prevLikedCars.includes(modelName);
       const updatedLikedCars = isLiked
@@ -148,18 +141,7 @@ const App = () => {
     });
   }, []);
 
-  const handleFindDealersForModel = (modelName) => {
-    setModelForDealershipSearch(modelName);
-    setIsComparisonViewActive(false);
-    const locatorElement = document.getElementById('dealership-locator-section');
-    if (locatorElement) locatorElement.scrollIntoView({ behavior: 'smooth' });
-  };
-  
-  const handleCloseDealershipLocator = () => {
-    setModelForDealershipSearch(null);
-  }
-
-  const handleToggleCompare = (searchItem) => {
+  const handleToggleCompare = (searchItem: HistoricCarSearch) => {
     setComparisonList(prev => {
       if (prev.find(item => item.modelName === searchItem.modelName)) {
         return prev.filter(item => item.modelName !== searchItem.modelName);
@@ -180,7 +162,6 @@ const App = () => {
     }
     setIsComparisonViewActive(true);
     setActiveSearch(null); 
-    setModelForDealershipSearch(null);
     setTimeout(() => { 
         const comparisonViewElement = document.getElementById('car-comparison-view-section');
         if (comparisonViewElement) {
@@ -193,10 +174,10 @@ const App = () => {
     setIsComparisonViewActive(false);
   };
 
-  const handleSelectModelFromGuideAndSearch = (modelName) => {
+  const handleSelectModelFromGuideAndSearch = (modelName: string) => {
     setIsCarTypesGuideOpen(false); 
-    const searchInput = document.querySelector('#car-search-section input[type="text"]'); // Removed 'as HTMLInputElement'
-    if (searchInput && searchInput instanceof HTMLInputElement) { // Added instanceof check for safety
+    const searchInput = document.querySelector('#car-search-section input[type="text"]');
+    if (searchInput && searchInput instanceof HTMLInputElement) {
         searchInput.value = modelName;
         const event = new Event('input', { bubbles: true });
         searchInput.dispatchEvent(event);
@@ -260,24 +241,7 @@ const App = () => {
             <LikedCarsList 
               likedCars={likedCars} 
               onUnlikeCar={handleToggleLikeCar}
-              onFindDealers={handleFindDealersForModel}
             />
-
-            {modelForDealershipSearch && (
-              <div id="dealership-locator-section">
-                <DealershipLocator 
-                  carModel={modelForDealershipSearch} 
-                  onClose={handleCloseDealershipLocator} 
-                />
-              </div>
-            )}
-            
-            {!modelForDealershipSearch && activeSearch && activeSearch.details.manufacturerInfo && (
-              <DealershipEmailer currentCarModel={activeSearch.modelName} />
-            )}
-            {!modelForDealershipSearch && !activeSearch && MOCK_DEALERSHIPS.length > 0 && (
-               <DealershipEmailer currentCarModel={null} />
-            )}
           </>
         )}
 

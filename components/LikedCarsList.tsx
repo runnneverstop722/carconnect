@@ -1,15 +1,13 @@
-
 import React from 'react';
 import { LikedCar } from '../types.ts';
-import { TrashIcon, MapPinIcon } from './icons.tsx';
+import { TrashIcon } from './icons.tsx';
 
 interface LikedCarsListProps {
   likedCars: LikedCar[];
   onUnlikeCar: (modelName: string) => void;
-  onFindDealers: (modelName: string) => void;
 }
 
-const LikedCarsList: React.FC<LikedCarsListProps> = ({ likedCars, onUnlikeCar, onFindDealers }) => {
+const LikedCarsList: React.FC<LikedCarsListProps> = ({ likedCars, onUnlikeCar }) => {
   if (likedCars.length === 0) {
     return (
       <div className="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-lg text-center">
@@ -31,15 +29,6 @@ const LikedCarsList: React.FC<LikedCarsListProps> = ({ likedCars, onUnlikeCar, o
           >
             <span className="text-lg text-gray-100 font-medium mb-2 sm:mb-0 sm:mr-4 flex-grow">{carModel}</span>
             <div className="flex space-x-2 flex-shrink-0">
-              <button
-                onClick={() => onFindDealers(carModel)}
-                className="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-blue-500 transition-colors"
-                title="Find dealers for this model"
-                aria-label={`Find dealers for ${carModel}`}
-              >
-                <MapPinIcon className="h-4 w-4 mr-1.5" />
-                Find Dealers
-              </button>
               <button
                 onClick={() => onUnlikeCar(carModel)}
                 className="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-red-500 transition-colors"

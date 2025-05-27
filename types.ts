@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -45,15 +44,6 @@ export interface HistoricCarSearch {
   details: CarDetails;
   timestamp: number; // To sort history or for other chronological purposes
   searchLanguage: string; // Language used for this specific search
-}
-
-export interface Dealership {
-  id: string;
-  name: string;
-  email: string;
-  location: string; // General location, e.g., "City, State"
-  address: string; // Specific address for map linking, e.g., "123 Main St, Anytown, USA"
-  brandAffiliations: string[]; // e.g., ["Toyota", "Honda"]
 }
 
 export enum AuthProvider {
