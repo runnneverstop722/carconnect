@@ -10,6 +10,7 @@ import CarTypesGuide from './components/CarTypesGuide.tsx';
 import { User, LikedCar, HistoricCarSearch, CarDetails } from './types.ts';
 import { mockLogout } from './services/mockAuthService.ts';
 import { fetchCarDetailsFromGemini } from './services/geminiService.ts';
+import { searchYouTubeVideos } from './services/youtubeService.ts';
 import { APP_NAME } from './constants.ts';
 import { XCircleIcon, BookOpenIcon } from './components/icons.tsx';
 
@@ -73,10 +74,21 @@ const App = () => {
     const userLang = navigator.language || 'en';
 
     try {
+      // Get car details from Gemini
       const details = await fetchCarDetailsFromGemini(modelName.trim(), userLang);
+      
+      // Get YouTube videos
+      const youtubeVideos = await searchYouTubeVideos(modelName.trim());
+      
+      // Combine the results
+      const combinedDetails = {
+        ...details,
+        youtubeVideos // This will override any YouTube videos from Gemini with real ones
+      };
+
       const newSearch = { 
         modelName: modelName.trim(), 
-        details, 
+        details: combinedDetails,
         timestamp: Date.now(),
         searchLanguage: userLang
       };
