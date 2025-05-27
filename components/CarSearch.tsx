@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, FormEvent } from 'react';
 import { CarDetails, LikedCar, HistoricCarSearch } from '../types.ts';
 import LoadingSpinner from './LoadingSpinner.tsx';
 import YouTubeResultCard from './YouTubeResultCard.tsx';
@@ -31,13 +31,19 @@ const CarSearch: React.FC<CarSearchProps> = ({
   const carDetails = activeSearch?.details;
   const currentSearchedModelForLike = activeSearch?.modelName;
 
-  const handleSearchClick = useCallback(() => {
-    if (!searchTerm.trim()) {
-      alert('Please enter a car model to search.');
-      return;
-    }
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!searchTerm.trim()) return;
     onInitiateSearch(searchTerm.trim());
-  }, [searchTerm, onInitiateSearch]);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!searchTerm.trim()) return;
+      onInitiateSearch(searchTerm.trim());
+    }
+  };
 
   const handleRivalClick = (rivalModelName: string) => {
     setSearchTerm(rivalModelName); 
@@ -48,7 +54,10 @@ const CarSearch: React.FC<CarSearchProps> = ({
     }
   };
 
-  const isCarLiked = (modelName: string | undefined) => modelName ? likedCars.includes(modelName) : false;
+  const isCarLiked = (modelName: string | undefined) => {
+    if (!modelName) return false;
+    return likedCars.some(car => car === modelName);
+  };
 
   const shareableContent = carDetails && currentSearchedModelForLike && carDetails.manufacturerInfo
     ? `Check out info for ${currentSearchedModelForLike} on CarConnect:\nManufacturer: ${carDetails.manufacturerInfo.name} (${carDetails.manufacturerInfo.homepage})\nSpecs: ${typeof carDetails.basicSpecs === 'string' ? carDetails.basicSpecs : 'See details'} \nMarket Presence: ${carDetails.marketPresence || 'N/A'}\nSentiment: ${carDetails.userReviewSentiment || 'N/A'}\nYouTube: ${carDetails.youtubeVideos && Array.isArray(carDetails.youtubeVideos) && carDetails.youtubeVideos.length > 0 ? carDetails.youtubeVideos[0].url : 'N/A'}`
@@ -95,28 +104,30 @@ const CarSearch: React.FC<CarSearchProps> = ({
     <div className="space-y-6">
       <div className="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-lg">
         <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4">Find Your Ride</h2>
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="e.g., Toyota Camry, Ford Mustang Mach-E"
+              onKeyPress={handleKeyPress}
+              placeholder="Enter a car model (e.g., Toyota Camry 2024)"
               className="flex-grow px-4 py-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              onKeyPress={(e) => e.key === 'Enter' && handleSearchClick()}
-              aria-label="Car model search input"
+              disabled={isLoading}
             />
           </div>
           <p className="text-xs text-gray-400">Your browser's language setting will be used to help find relevant regional information and display results.</p>
           <button
-            onClick={handleSearchClick}
-            disabled={isLoading}
-            className="w-full sm:w-auto flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500 disabled:opacity-60 transition duration-150 ease-in-out"
+            type="submit"
+            disabled={isLoading || !searchTerm.trim()}
+            className={`w-full sm:w-auto flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500 disabled:opacity-60 transition duration-150 ease-in-out ${
+              isLoading || !searchTerm.trim() ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             <SearchIcon className="h-5 w-5 mr-2" />
             {isLoading ? 'Searching...' : 'Search'}
           </button>
-        </div>
+        </form>
       </div>
 
       {isLoading && <LoadingSpinner />}
@@ -164,24 +175,6 @@ const CarSearch: React.FC<CarSearchProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               {carDetails.manufacturerInfo && (
                 <ManufacturerLink manufacturer={carDetails.manufacturerInfo} />
-              )}
-              {carDetails.buildAndPriceUrl && (
-                 <a
-                  href={carDetails.buildAndPriceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-4 bg-green-700 hover:bg-green-600 rounded-lg shadow-md transition-all duration-200 ease-in-out transform hover:scale-[1.02]"
-                >
-                  <div className="flex items-center space-x-3">
-                    <CurrencyDollarIcon className="h-8 w-8 text-green-200 flex-shrink-0" />
-                    <div>
-                      <h4 className="text-md font-semibold text-white">
-                        Build & Price Online
-                      </h4>
-                      <p className="text-xs text-green-100 truncate" title={carDetails.buildAndPriceUrl}>Configure this model</p>
-                    </div>
-                  </div>
-                </a>
               )}
             </div>
 
@@ -265,38 +258,7 @@ const CarSearch: React.FC<CarSearchProps> = ({
             {carDetails.maintenanceSummary && (
               <DetailSection title="Maintenance Highlights" icon={<WrenchScrewdriverIcon className="h-5 w-5 text-blue-300" />}>
                 <p className="text-gray-300 whitespace-pre-line">{carDetails.maintenanceSummary}</p>
-                {carDetails.ownersManualLink && (
-                  <div className="mt-3">
-                    <a
-                      href={carDetails.ownersManualLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-teal-500 transition-colors"
-                    >
-                      <BookOpenIcon className="h-4 w-4 mr-2" />
-                      View Owner's Manual / Support (External Link)
-                    </a>
-                  </div>
-                )}
               </DetailSection>
-            )}
-
-            {carDetails.recallNotices && carDetails.recallNotices.length > 0 && (
-              <DetailSection title="Recall Information" icon={<ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" />}>
-                 <ListDisplay 
-                  items={carDetails.recallNotices} 
-                  emptyText="No specific recall notices found by the AI." 
-                  itemClassName="bg-yellow-800/30 p-2 rounded text-sm text-yellow-200"
-                  itemIcon={<ExclamationTriangleIcon className="h-4 w-4 text-yellow-400"/>}
-                />
-                 <p className="text-xs text-gray-500 mt-2">Note: Always verify recall information with official manufacturer or government safety agency websites.</p>
-              </DetailSection>
-            )}
-             {carDetails.recallNotices && carDetails.recallNotices.length === 0 && carDetails.manufacturerInfo && ( 
-                <DetailSection title="Recall Information" icon={<ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" />}>
-                     <p className="text-gray-400 text-sm italic">No specific recall notices found by the AI for this model at this time.</p>
-                     <p className="text-xs text-gray-500 mt-2">Note: Always verify recall information with official manufacturer or government safety agency websites.</p>
-                </DetailSection>
             )}
 
             <div className="grid md:grid-cols-2 gap-6">
