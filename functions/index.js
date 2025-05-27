@@ -234,10 +234,10 @@ export const api = onRequest(
   app
 );
 
-// For local development and Cloud Run
-const port = process.env.PORT || 8080;
-if (process.env.NODE_ENV !== 'production') {
+// Only start local server when explicitly in development mode
+if (process.env.NODE_ENV === 'development') {
+  const port = process.env.PORT || 8080;
   app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
+    console.log(`Development server listening on port ${port}`);
   });
 }
