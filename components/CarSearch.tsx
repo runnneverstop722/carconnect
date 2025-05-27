@@ -237,17 +237,6 @@ const CarSearch: React.FC<CarSearchProps> = ({
               </DetailSection>
             )}
             
-            {carDetails.imageDescriptions && carDetails.imageDescriptions.length > 0 && (
-              <DetailSection title="Visual Highlights (Descriptions)" icon={<CameraIcon className="h-5 w-5 text-blue-300" />}>
-                <ListDisplay 
-                  items={carDetails.imageDescriptions} 
-                  itemClassName="bg-gray-700 p-3 rounded-md text-sm text-gray-300 shadow" 
-                  emptyText="No visual descriptions available."
-                  itemIcon={<CameraIcon className="h-4 w-4 text-gray-400" />}
-                />
-              </DetailSection>
-            )}
-
             {/* Updated Image Gallery Section */}
             {carDetails.imageUrls && carDetails.imageUrls.length > 0 && (
               <DetailSection title="Image Gallery" icon={<CameraIcon className="h-5 w-5 text-blue-300" />}>
@@ -256,7 +245,7 @@ const CarSearch: React.FC<CarSearchProps> = ({
                     <div key={index} className="aspect-video bg-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
                       <img 
                         src={url} 
-                        alt={ (carDetails.imageDescriptions && carDetails.imageDescriptions[index]) ? carDetails.imageDescriptions[index] : `${activeSearch.modelName} image ${index + 1}` }
+                        alt={`${activeSearch.modelName} image ${index + 1}`}
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -266,8 +255,6 @@ const CarSearch: React.FC<CarSearchProps> = ({
                  <p className="text-xs text-gray-500 mt-2 text-center">Images provided by Google Custom Search.</p>
               </DetailSection>
             )}
-            {/* End of Updated Image Gallery Section */}
-
 
             {carDetails.uniqueFeatures && carDetails.uniqueFeatures.length > 0 && (
               <DetailSection title="Unique Features">
