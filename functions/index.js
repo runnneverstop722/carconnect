@@ -6,26 +6,25 @@ import cors from 'cors';
 import { onRequest } from 'firebase-functions/v2/https';
 // Import fetch for making HTTP requests
 import fetch from 'node-fetch';
-import { config } from 'firebase-functions';
 
-// Load environment variables from .env file for local development (Firebase Emulator)
+// Load environment variables from .env file for local development
 dotenv.config();
 
-// Get config values
-const functionConfig = config();
-const GOOGLE_SEARCH_API_KEY = functionConfig?.env?.custom_search_api_key || process.env.CUSTOM_SEARCH_API_KEY;
-const GOOGLE_SEARCH_CX_ID = functionConfig?.env?.imagesearch_cs_id || process.env.IMAGESEARCH_CS_ID;
-const GEMINI_API_KEY = functionConfig?.env?.gemini_api_key || process.env.GEMINI_API_KEY;
+// Get environment variables with fallbacks
+const GOOGLE_SEARCH_API_KEY = process.env.CUSTOM_SEARCH_API_KEY;
+const GOOGLE_SEARCH_CX_ID = process.env.IMAGESEARCH_CS_ID;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 const app = express();
 
 // --- CORS Configuration ---
 const corsOptions = {
-  origin: functionConfig?.env?.frontend_url || 'http://localhost:3000',
+  origin: FRONTEND_URL,
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
-console.log(`CORS configured for origin: ${functionConfig?.env?.frontend_url || 'http://localhost:3000 (fallback for local)'}`);
+console.log(`CORS configured for origin: ${FRONTEND_URL}`);
 
 // Add health check endpoint
 app.get('/', (req, res) => {
@@ -234,10 +233,4 @@ export const api = onRequest(
   app
 );
 
-// Only start local server when explicitly in development mode
-if (process.env.NODE_ENV === 'development') {
-  const port = process.env.PORT || 8080;
-  app.listen(port, () => {
-    console.log(`Development server listening on port ${port}`);
-  });
-}
+
