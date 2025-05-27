@@ -13,8 +13,9 @@ dotenv.config();
 
 // Get config values
 const functionConfig = config();
-const GOOGLE_SEARCH_API_KEY = functionConfig?.env?.custom_search_api_key || process.env.VITE_IMAGE_SEARCH_API_KEY;
-const GOOGLE_SEARCH_CX_ID = functionConfig?.env?.imagesearch_cs_id || process.env.VITE_IMAGE_SEARCH_CS_ID;
+const GOOGLE_SEARCH_API_KEY = functionConfig?.env?.custom_search_api_key || process.env.CUSTOM_SEARCH_API_KEY;
+const GOOGLE_SEARCH_CX_ID = functionConfig?.env?.imagesearch_cs_id || process.env.IMAGESEARCH_CS_ID;
+const GEMINI_API_KEY = functionConfig?.env?.gemini_api_key || process.env.GEMINI_API_KEY;
 
 const app = express();
 
@@ -26,11 +27,15 @@ const corsOptions = {
 app.use(cors(corsOptions));
 console.log(`CORS configured for origin: ${functionConfig?.env?.frontend_url || 'http://localhost:3000 (fallback for local)'}`);
 
+// Add health check endpoint
+app.get('/', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
 // --- Gemini API Configuration ---
-const GEMINI_API_KEY = functionConfig?.env?.gemini_api_key || process.env.API_KEY;
 const MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
 
 if (!GEMINI_API_KEY) {
@@ -217,11 +222,22 @@ app.post('/api/fetch-car-details', async (req, res) => {
   res.status(200).json(finalCarDetailsResponse);
 });
 
+// Export for Cloud Functions
 export const api = onRequest(
   {
-    // region: 'us-central1', 
-    // memory: '256MiB', 
-    // timeoutSeconds: 60, 
+    region: 'us-central1',
+    memory: '256MiB',
+    timeoutSeconds: 60,
+    minInstances: 0,
+    maxInstances: 100,
   },
   app
 );
+
+// For local development and Cloud Run
+const port = process.env.PORT || 8080;
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+}
