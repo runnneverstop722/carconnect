@@ -1,4 +1,3 @@
-
 import express from 'express';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
@@ -68,7 +67,7 @@ app.post('/api/fetch-car-details', async (req, res) => {
   If a piece of information is not available or applicable, clearly state "Not available" or omit the field for lists/objects.
   Focus on models typically sold in a region that primarily uses ${userLanguage || 'English'}, if regional variations exist.
 
-  1.  **YouTube Videos**: List up to 3 relevant YouTube video titles and their full URLs (reviews, official ads, walkarounds).
+  1.  **YouTube Videos**: Find up to 3 real, existing YouTube videos about this car model. Include only videos that you are confident exist on YouTube. Include the exact title and full URL. Focus on recent reviews, official manufacturer videos, or professional walkarounds. If you're not confident about a video's existence, return an empty list [].
   2.  **Manufacturer Info**: Provide the manufacturer's name and official homepage URL.
   3.  **Basic Specifications**: Provide key general specifications as a JSON object. Include keys for: "Engine Type", "Power (hp or kW)", "Torque (lb-ft or Nm)", "Transmission", "Drivetrain", "Fuel Economy (combined, MPG or L/100km)", "Length", "Width (specify if with/without mirrors)", "Height", "Wheelbase", "Curb Weight", "Cargo Volume". If a specific detail is not available, set its value to "Not available".
   4.  **Tire Information**: Provide tire specifications as a JSON object. Include keys for: "size" (e.g., "235/45R18" - note if front/rear sizes differ), "model" (the specific tire model name, if commonly known), and "type" (e.g., "All-season", "Performance"). If any detail is not available, set its value to "Not available" or omit the key if the entire object is empty.
