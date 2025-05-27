@@ -171,28 +171,46 @@ app.post('/api/fetch-car-details', async (req, res) => {
   let imageUrls = [];
   if (GOOGLE_SEARCH_API_KEY && GOOGLE_SEARCH_CX_ID) {
     try {
-      const searchQuery = `${carModel} car exterior official photo`; 
+      const searchQuery = `${carModel} mercedes benz`; // Simplified search query
       const numImages = 5; 
-      const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_CX_ID}&q=${encodeURIComponent(searchQuery)}&searchType=image&num=${numImages}&safe=active&imgSize=large`;
+      const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_CX_ID}&q=${encodeURIComponent(searchQuery)}&searchType=image&num=${numImages}`;
 
+      console.log('Making image search request for:', searchQuery);
       const searchResponse = await fetch(searchUrl);
+      
       if (!searchResponse.ok) {
         const errorBody = await searchResponse.text();
         console.error(`Image search API error: ${searchResponse.status} ${searchResponse.statusText}`, errorBody);
       } else {
-         const searchData = await searchResponse.json();
-        if (searchData.items && Array.isArray(searchData.items)) {
+        const searchData = await searchResponse.json();
+        console.log('Image search response:', JSON.stringify({
+          status: searchResponse.status,
+          hasItems: !!searchData.items,
+          itemsLength: searchData.items?.length,
+          error: searchData.error?.message,
+          totalResults: searchData.searchInformation?.totalResults
+        }));
+        
+        if (searchData.error) {
+          console.error('Google Custom Search API error:', searchData.error);
+        } else if (searchData.items && Array.isArray(searchData.items)) {
           imageUrls = searchData.items.map(item => item.link).filter(link => typeof link === 'string');
           console.log(`Successfully found ${imageUrls.length} image URLs.`);
         } else {
-            console.warn("Image search response items not found or not an array.");
+          console.warn("Image search response items not found or not an array. Full response:", JSON.stringify(searchData));
         }
       }
     } catch (error) {
       console.error('Error calling Google Custom Search API:', error);
+      if (error.response) {
+        console.error('Error response:', error.response);
+      }
     }
   } else {
-      console.warn("Image search skipped because API keys (VITE_IMAGE_SEARCH_API_KEY, VITE_IMAGE_SEARCH_CS_ID) are not configured.");
+    console.warn("Image search skipped because API keys are not configured:", {
+      hasSearchKey: !!GOOGLE_SEARCH_API_KEY,
+      hasCxId: !!GOOGLE_SEARCH_CX_ID
+    });
   }
 
 
