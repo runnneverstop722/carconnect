@@ -1,4 +1,3 @@
-
 import express from 'express';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
@@ -7,32 +6,35 @@ import cors from 'cors';
 import { onRequest } from 'firebase-functions/v2/https';
 // Import fetch for making HTTP requests
 import fetch from 'node-fetch';
-
+import { config } from 'firebase-functions';
 
 // Load environment variables from .env file for local development (Firebase Emulator)
 dotenv.config();
 
+// Get config values
+const functionConfig = config();
+const GOOGLE_SEARCH_API_KEY = functionConfig?.env?.custom_search_api_key || process.env.VITE_IMAGE_SEARCH_API_KEY;
+const GOOGLE_SEARCH_CX_ID = functionConfig?.env?.imagesearch_cs_id || process.env.VITE_IMAGE_SEARCH_CS_ID;
 
 const app = express();
 
 // --- CORS Configuration ---
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Allow localhost for local dev/emulator, and your deployed frontend URL
+  origin: functionConfig?.env?.frontend_url || 'http://localhost:3000',
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
-console.log(`CORS configured for origin: ${process.env.FRONTEND_URL || 'http://localhost:3000 (fallback for local)'}`);
-
+console.log(`CORS configured for origin: ${functionConfig?.env?.frontend_url || 'http://localhost:3000 (fallback for local)'}`);
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
 // --- Gemini API Configuration ---
-const GEMINI_API_KEY = process.env.API_KEY;
+const GEMINI_API_KEY = functionConfig?.env?.gemini_api_key || process.env.API_KEY;
 const MODEL_NAME = 'gemini-2.5-flash-preview-04-17';
 
 if (!GEMINI_API_KEY) {
-  console.error("CRITICAL: Gemini API key (process.env.API_KEY) not found in server environment variables. AI features will not work.");
+  console.error("CRITICAL: Gemini API key not found in server environment variables. AI features will not work.");
 }
 
 let ai;
@@ -45,18 +47,13 @@ if (GEMINI_API_KEY) {
   }
 } else {
   ai = null;
-  console.warn("Gemini AI client not initialized because API_KEY is missing.");
+  console.warn("Gemini AI client not initialized because API key is missing.");
 }
 
 // --- Google Custom Search API Configuration ---
-// Ensure these exact names (IMAGE_SEARCH_API_KEY, IMAGE_SEARCH_CX_ID) are used when setting Firebase environment variables.
-const GOOGLE_SEARCH_API_KEY = process.env.IMAGE_SEARCH_API_KEY; 
-const GOOGLE_SEARCH_CX_ID = process.env.IMAGE_SEARCH_CX_ID;     
-
 if (!GOOGLE_SEARCH_API_KEY || !GOOGLE_SEARCH_CX_ID) {
-  console.warn("Warning: Google Custom Search API keys (IMAGE_SEARCH_API_KEY, IMAGE_SEARCH_CX_ID) not found in server environment variables. Image search will not work.");
+  console.warn("Warning: Google Custom Search API configuration not found. Image search will not work.");
 }
-
 
 // --- API Proxy Endpoint ---
 app.post('/api/fetch-car-details', async (req, res) => {
@@ -191,7 +188,7 @@ app.post('/api/fetch-car-details', async (req, res) => {
       console.error('Error calling Google Custom Search API:', error);
     }
   } else {
-      console.warn("Image search skipped because API keys (IMAGE_SEARCH_API_KEY, IMAGE_SEARCH_CX_ID) are not configured.");
+      console.warn("Image search skipped because API keys (VITE_IMAGE_SEARCH_API_KEY, VITE_IMAGE_SEARCH_CS_ID) are not configured.");
   }
 
 
